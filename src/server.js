@@ -1,8 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const productRoutes = require('./routes/products.routes');
-app.use('/api/products', productRoutes);
 
 // Inicializa o aplicativo Express
 const app = express();
@@ -10,6 +8,9 @@ const app = express();
 // Middlewares básicos
 app.use(cors()); // Permite que o front-end se comunique com esta API
 app.use(express.json()); // Permite que a API entenda requisições no formato JSON
+
+const productRoutes = require('./routes/products.routes');
+app.use('/api/products', productRoutes);
 
 // Rota de teste (Health Check)
 app.get('/', (req, res) => {
