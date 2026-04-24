@@ -1,23 +1,36 @@
-<div style="background: #f8f9fa; padding: 20px; margin: 20px; border-radius: 8px; border: 1px solid #ddd;">
-  <h3 style="margin-top: 0;">Novo Produto</h3>
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
   
-  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+  <div style="margin-bottom: 15px;">
+    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Nome do Produto <span style="color: red;">*</span></label>
+    <input type="text" formControlName="name" placeholder="Ex: Calça Jeans Flare" 
+           style="width: 100%; padding: 8px; border-radius: 4px;"
+           [style.border]="productForm.get('name')?.invalid && productForm.get('name')?.touched ? '1px solid red' : '1px solid #ccc'">
     
-    <div style="margin-bottom: 15px;">
-      <label style="font-weight: bold; display: block; margin-bottom: 5px;">Nome do Produto:</label>
-      <input type="text" formControlName="name" placeholder="Ex: Calça Jeans" 
-             style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-    </div>
+    @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
+      <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">
+        O nome do produto é obrigatório.
+      </span>
+    }
+  </div>
 
-    <div style="margin-bottom: 15px;">
-      <label style="font-weight: bold; display: block; margin-bottom: 5px;">Categoria:</label>
-      <input type="text" formControlName="category" placeholder="Ex: Calças" 
-             style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-    </div>
+  <div style="margin-bottom: 15px;">
+    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Categoria <span style="color: red;">*</span></label>
+    <input type="text" formControlName="category" placeholder="Ex: Calças" 
+           style="width: 100%; padding: 8px; border-radius: 4px;"
+           [style.border]="productForm.get('category')?.invalid && productForm.get('category')?.touched ? '1px solid red' : '1px solid #ccc'">
+    
+    @if (productForm.get('category')?.invalid && productForm.get('category')?.touched) {
+      <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">
+        A categoria é obrigatória.
+      </span>
+    }
+  </div>
 
-    <button type="submit" [disabled]="productForm.invalid" 
+  <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+    <button type="submit" 
+            [style.opacity]="productForm.invalid ? '0.5' : '1'"
             style="padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
       Salvar Produto
     </button>
-  </form>
-</div>
+  </div>
+</form>

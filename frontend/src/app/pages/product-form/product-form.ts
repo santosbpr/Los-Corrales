@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 // 1. Importamos as ferramentas de Formulário
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
@@ -12,6 +12,19 @@ import { ProductService } from '../../services/product';
   styleUrl: './product-form.scss'
 })
 export class ProductFormComponent {
+  currentProductId: string | number | null = null;
+
+  @Input() set product(val: any) {
+    if (val) { //Se receber um produto, preenche o formulário com os dados para edição
+      this.productForm.patchValue(val);
+      this.currentProductId = val.id;
+    } else {
+      this.productForm.reset();
+      this.currentProductId = null;
+    }
+
+    }
+
   // 3. Criamos o nosso formulário com regras (campos obrigatórios)
   productForm = new FormGroup({
     name: new FormControl('', Validators.required),
@@ -34,16 +47,22 @@ export class ProductFormComponent {
         ]
       };
 
-      this.productService.createProduct(newProduct).subscribe({
-        next: (response) => {
-          alert('Produto cadastrado com sucesso!'); // Avisa o usuário
-          this.productForm.reset(); // Limpa os campos
-        },
-        error: (err) => {
-          console.error('Erro ao salvar:', err);
-          alert('Erro ao salvar produto.');
-        }
-      });
+      if (this.currentProductId) {
+        this.productService.updateProduct(this.currentProductId, newProduct).subscribe({
+          next: () => {
+            alert('Produto atualizado!');
+            // Obs: A janela já vai fechar sozinha porque a lista está ouvindo o sinal!
+          },
+          error: (err) => alert('Erro ao atualizar.')
+        });
+      } else {
+        this.productService.createProduct(newProduct).subscribe({
+          next: () => alert('Produto cadastrado com sucesso!'),
+          error: (err) => alert('Erro ao salvar produto.')
+        });
+      }
+    } else {
+      this.productForm.markAllAsTouched(); // Mostra os erros de validação  
     }
   }
 }

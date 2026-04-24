@@ -9,9 +9,9 @@ export const routes: Routes = [
     // redireciona para pag de estoque
     {path: 'stock', component: ProductListComponent},
 
-    //Caso haja caminhos inexistentes, redireciona
-    {path: '**', redirectTo: 'stock'},
-
     // redireciona para o dashboard
-    {path: 'dashboard', component: DashboardComponent}
+    {path: 'dashboard', component: DashboardComponent},
+
+    //Caso haja caminhos inexistentes, redireciona
+    {path: '**', redirectTo: 'stock'} //SEMPRE COLOCAR POR ÚLTIMO, POIS ELE VAI REDIRECIONAR PARA QUALQUER ROTA QUE NÃO EXISTA
 ];

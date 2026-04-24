@@ -28,4 +28,22 @@ export class ProductService {
       })
     );
   }
+
+  //Atualiza um produto existente
+  updateProduct(id:string | number, product: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${id}`, product).pipe(
+      tap(() => {
+        this._refreshNeeded$.next();
+      })
+    );
+  }
+
+  //Deleta um produto existente
+  deleteProduct(id: string | number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        this._refreshNeeded$.next();
+      })
+    );
+  }
 }

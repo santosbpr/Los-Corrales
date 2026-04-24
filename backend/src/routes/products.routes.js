@@ -1,11 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const ProductController = require('../controllers/ProductController');
+const ProductController = require('../controllers/product.controller');
 
-//Quando o Front fizer um POST para /api/products, chamamos o controlador
-router.post('/', ProductController.createProductWithVariants);
+// LISTAR 
+router.get('/', ProductController.getAll);
 
-//Quando fizer um GET, listamos os produtos
-router.get('/', ProductController.listAll);
+// CRIAR
+router.post('/', ProductController.create);
+
+// ATUALIZAR
+router.put('/:id', ProductController.update);
+
+// DELETAR
+router.delete('/:id', ProductController.delete);
 
 module.exports = router;

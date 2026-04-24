@@ -2,19 +2,57 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product'; // Ajustado para o nome curto
 import { ProductFormComponent } from '../product-form/product-form';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, ProductFormComponent],
+  imports: [CommonModule, ProductFormComponent, FormsModule],
   templateUrl: './product-list.html', // Ajustado para o seu arquivo
   styleUrl: './product-list.scss'     // Ajustado para o seu arquivo
 })
 export class ProductListComponent implements OnInit {
   products: any[] = [];
+  isModalOpen = false //Varial que controla a janela modal de cadastro
+  productToEdit: any = null; //Guarda o produto selecionado para edição
+  searchTerm: string = ''; // Variável para armazenar o termo de busca
 
-  //Varial que controla a janela modal de cadastro
-  isModalOpen = false
+
+  // Função para filtrar os produtos com base no termo de busca
+  get filteredProducts() {
+    if (!this.searchTerm) {
+      return this.products; // Se não houver termo de busca, retorna todos os produtos
+    }
+    return this.products.filter(product =>
+      product.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+  } 
+  
+  // Função para abror o modal de NOVo produto
+  openNewProductModal() {
+    this.productToEdit = null; // Garante que o formulário esteja vazio
+    this.isModalOpen = true;
+  }
+
+  //Funcão para abrir o modal de edição, preenchendo os campos com os dados do produto selecionado
+  editProduct(product: any) {
+
+    console.log('Produto selecionado para edição:', product);
+
+    this.productToEdit = product; // Passa os dados do produto para o formulário
+    this.isModalOpen = true;
+  }
+
+  // Função para deletar um produto, confirmando a ação com o usuário
+  deleteProduct(id: string | number) {
+    if (confirm('Tem certeza que deseja deletar este produto?')) {
+      this.productService.deleteProduct(id).subscribe({
+        next: () => console.log('Produto deletado com sucesso!'),
+        error: (err) => console.error('Erro ao deletar produto:', err)
+      });
+    }
+  }
+
 
   constructor(private productService: ProductService, private cdRef: ChangeDetectorRef) {}
 
@@ -51,6 +89,8 @@ export class ProductListComponent implements OnInit {
   closeModal() {
     this.isModalOpen = false;
   }
+
+
   // ngOnInit(): void {
   //   this.productService.getProducts().subscribe({
   //     next: (data: any) => {

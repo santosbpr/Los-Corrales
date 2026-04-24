@@ -1,39 +1,60 @@
-
 <div style="font-family: Arial, sans-serif; padding: 20px;">
-  <h2>Catálogo de Produtos - Los Corrales</h2>
-  <hr>
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-  <h2>Estoque de Produtos</h2>
-  <button (click)="openModal()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
-    + Novo Produto
-  </button>
-  </div>
   
-  @if (isModalOpen) {
-  <div class="modal-overlay">
-    <div class="modal-content">
-      
-      <div style="display: flex; justify-content: flex-end;">
-        <button (click)="closeModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;">
-          &times;
-        </button>
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+    <h2 style="margin: 0;">📦 Estoque de Produtos</h2>
+    
+    <div style="display: flex; gap: 15px; align-items: center;">
+      <div style="position: relative;">
+        <span style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #666;">🔍</span>
+        <input type="text" 
+               [(ngModel)]="searchTerm" 
+               placeholder="Buscar roupa ou categoria..." 
+               style="padding: 10px 10px 10px 35px; width: 250px; border: 1px solid #ccc; border-radius: 5px; outline: none; font-size: 14px;">
       </div>
 
-      <app-product-form></app-product-form>
-
+      <button (click)="openNewProductModal()" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">
+        + Novo Produto
+      </button>
     </div>
   </div>
-}
-  @if (products.length === 0) {
-    <p>Nenhum produto cadastrado no momento ou carregando...</p>
-  } @else {
-    <ul>
-      @for (product of products; track product.id) {
-        <li style="margin-bottom: 10px;">
-          <strong>{{ product.name }}</strong> <br>
-          <small>ID: {{ product.id }} | Categoria: {{ product.category }}</small>
-        </li>
-      }
-    </ul>
+  <hr style="margin-bottom: 20px; border: 0; border-top: 1px solid #ddd;">
+  
+  @if (isModalOpen) {
+    <div class="modal-overlay">
+      <div class="modal-content">
+        <div style="display: flex; justify-content: flex-end;">
+          <button (click)="closeModal()" style="background: none; border: none; font-size: 24px; cursor: pointer;">&times;</button>
+        </div>
+        <app-product-form [product]="productToEdit"></app-product-form>
+      </div>
+    </div>
   }
+
+  @if (filteredProducts.length === 0) {
+    <p style="color: #666; font-style: italic;">Nenhum produto encontrado...</p>
+  } @else {
+    <table style="width: 100%; text-align: left; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="padding-bottom: 10px; border-bottom: 2px solid #ccc;">Nome</th>
+          <th style="padding-bottom: 10px; border-bottom: 2px solid #ccc;">Categoria</th>
+          <th style="padding-bottom: 10px; border-bottom: 2px solid #ccc;">Ações</th> 
+        </tr>
+      </thead>
+      
+      <tbody>
+        @for (product of filteredProducts; track product.id) {
+          <tr>
+            <td style="padding: 15px 0; border-bottom: 1px solid #eee;">{{ product.name }}</td>
+            <td style="padding: 15px 0; border-bottom: 1px solid #eee;">{{ product.category }}</td>
+            <td style="padding: 15px 0; border-bottom: 1px solid #eee;">
+              <button (click)="editProduct(product)" style="background: transparent; border: none; cursor: pointer; font-size: 18px;" title="Editar">✏️</button>
+              <button (click)="deleteProduct(product.id)" style="background: transparent; border: none; cursor: pointer; font-size: 18px; margin-left: 10px;" title="Excluir">🗑️</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+
 </div>

@@ -1,4 +1,18 @@
-<div style="background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-  <h2>📊 Dashboard do Los Corrales</h2>
-  <p>Bem-vindo! Em breve, o Miguel trará os dados do banco para montarmos os gráficos de vendas e avisos de estoque baixo aqui.</p>
+<div style="font-family: Arial, sans-serif; padding: 20px;">
+  <h2 style="margin-bottom: 20px;">📊 Dashboard - Los Corrales</h2>
+  <hr style="margin-bottom: 20px; border: 0; border-top: 1px solid #ddd;">
+
+  <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    
+    <div style="background: #fff; border: 1px solid #e0e0e0; border-left: 5px solid #000; border-radius: 8px; padding: 20px; width: 220px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+      <h3 style="margin: 0; color: #666; font-size: 14px; text-transform: uppercase;">Total de Produtos</h3>
+      <p style="font-size: 38px; font-weight: bold; margin: 10px 0 0 0; color: #000;">{{ totalProducts }}</p>
+    </div>
+
+    <div style="background: #fff; border: 1px solid #e0e0e0; border-left: 5px solid #28a745; border-radius: 8px; padding: 20px; width: 220px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+      <h3 style="margin: 0; color: #666; font-size: 14px; text-transform: uppercase;">Categorias Ativas</h3>
+      <p style="font-size: 38px; font-weight: bold; margin: 10px 0 0 0; color: #28a745;">{{ totalCategories }}</p>
+    </div>
+
+  </div>
 </div>
