@@ -37,7 +37,7 @@ const ProductController = {
             console.error(error);
             return res.status(500).json({ error: 'Erro interno ao processar o cadastro.' });
         }
-    },
+    }, // <-- OLHA A VÍRGULA AQUI! Ela é essencial para separar as funções.
 
     // Segunda função: Listar
     async listAll(req, res) {
@@ -47,34 +47,6 @@ const ProductController = {
         } catch (error) {
             console.error(error);
             return res.status(500).json({ error: 'Erro ao buscar o catálogo de produtos.' });
-        }
-    },
-
-    //Buscar Produto por ID e suas variantes
-    async findById(req, res) {
-        try {
-            // Pega o ID que o usuário digitou na URL
-            const { id } = req.params;
-
-            // Busca o produto base
-            const product = await Product.findById(id);
-
-            if (!product) {
-                return res.status(404).json({ error: 'Produto não encontrado.' });
-            }
-
-            // Se achou o produto, busca também as cores e tamanhos (variantes) dele
-            const variants = await Variant.findByProductId(product.id);
-
-            // Retorna tudo empacotado para o front-end
-            return res.status(200).json({
-                product: product,
-                variants: variants
-            });
-
-        } catch (error) {
-            console.error(error);
-            return res.status(500).json({ error: 'Ocorreu um erro ao buscar os detalhes do produto.' });
         }
     }
 };

@@ -2,25 +2,26 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 
-// Inicializa o aplicativo Express
+// 1. Inicializa o aplicativo Express (O "app" nasce aqui!)
 const app = express();
 
-// Middlewares básicos
-app.use(cors()); // Permite que o front-end se comunique com esta API
-app.use(express.json()); // Permite que a API entenda requisições no formato JSON
+// 2. Middlewares básicos (Avisam o app como ele deve se comportar)
+app.use(cors()); 
+app.use(express.json()); 
 
+// 3. Importação e uso das rotas (Agora sim, o app já existe para ser usado!)
 const productRoutes = require('./routes/products.routes');
 app.use('/api/products', productRoutes);
 
-// Rota de teste (Health Check)
+// 4. Rota de teste (Health Check)
 app.get('/', (req, res) => {
     res.json({ 
-        message: 'API do ERP Los Corrales funcionando perfeitamente!',
+        message: 'API do ERP funcionando perfeitamente!',
         version: '1.0.0'
     });
 });
 
-// Define a porta e inicia o servidor
+// 5. Define a porta e inicia o servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);

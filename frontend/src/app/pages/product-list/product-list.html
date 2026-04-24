@@ -1,0 +1,17 @@
+<div style="font-family: Arial, sans-serif; padding: 20px;">
+  <h2>Catálogo de Produtos - Los Corrales</h2>
+  <hr>
+
+  @if (products.length === 0) {
+    <p>Nenhum produto cadastrado no momento ou carregando...</p>
+  } @else {
+    <ul>
+      @for (product of products; track product.id) {
+        <li style="margin-bottom: 10px;">
+          <strong>{{ product.name }}</strong> <br>
+          <small>ID: {{ product.id }} | Categoria: {{ product.category }}</small>
+        </li>
+      }
+    </ul>
+  }
+</div>
