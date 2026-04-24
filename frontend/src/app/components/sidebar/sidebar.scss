@@ -1,0 +1,35 @@
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  background-color: #1a1a1a; // Cor base que poderá ser variável no futuro
+  color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+
+  .nav-links {
+    list-style: none;
+    padding: 0;
+    margin-top: 40px;
+    flex-grow: 1;
+
+    li {
+      margin-bottom: 15px;
+      
+      a {
+        color: #ccc;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-radius: 5px;
+        transition: 0.3s;
+
+        &:hover, &.active-link {
+          background-color: #333;
+          color: white;
+        }
+      }
+    }
+  }
+}

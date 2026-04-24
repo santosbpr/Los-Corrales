@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductListComponent } from './pages/product-list/product-list';
-import { ProductFormComponent } from './pages/product-form/product-form';
+import { RouterOutlet } from '@angular/router';
+import { SidebarComponent } from './components/sidebar/sidebar';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ ProductListComponent, CommonModule, ProductFormComponent],
+  imports: [ CommonModule, RouterOutlet, SidebarComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
