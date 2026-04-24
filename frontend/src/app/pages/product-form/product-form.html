@@ -1,0 +1,23 @@
+<div style="background: #f8f9fa; padding: 20px; margin: 20px; border-radius: 8px; border: 1px solid #ddd;">
+  <h3 style="margin-top: 0;">Novo Produto</h3>
+  
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+    
+    <div style="margin-bottom: 15px;">
+      <label style="font-weight: bold; display: block; margin-bottom: 5px;">Nome do Produto:</label>
+      <input type="text" formControlName="name" placeholder="Ex: Calça Jeans" 
+             style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label style="font-weight: bold; display: block; margin-bottom: 5px;">Categoria:</label>
+      <input type="text" formControlName="category" placeholder="Ex: Calças" 
+             style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+    </div>
+
+    <button type="submit" [disabled]="productForm.invalid" 
+            style="padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+      Salvar Produto
+    </button>
+  </form>
+</div>
