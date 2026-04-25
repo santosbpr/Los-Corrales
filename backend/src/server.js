@@ -1,6 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const authRoutes = require('./routes/auth.routes');
+const productRoutes = require('./routes/products.routes');
 
 // 1. Inicializa o aplicativo Express (O "app" nasce aqui!)
 const app = express();
@@ -10,7 +12,7 @@ app.use(cors());
 app.use(express.json()); 
 
 // 3. Importação e uso das rotas (Agora sim, o app já existe para ser usado!)
-const productRoutes = require('./routes/products.routes');
+app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 
 // 4. Rota de teste (Health Check)

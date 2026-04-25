@@ -1,13 +1,12 @@
-<div class="app-container">
-  <app-sidebar></app-sidebar>
+<div style="display: flex; min-height: 100vh;">
+  
+  @if (showSidebar) {
+    <div style="width: 250px; background-color: #1a1a1a; color: white;">
+      </div>
+  }
 
-  <main class="content">
-    <header class="top-bar">
-      <span>Bem-vindo ao ERP Los Corrales</span>
-    </header>
+  <div style="flex-grow: 1; width: 100%;">
+    <router-outlet></router-outlet>
+  </div>
 
-    <section class="view-area">
-      <router-outlet></router-outlet>
-    </section>
-  </main>
 </div>

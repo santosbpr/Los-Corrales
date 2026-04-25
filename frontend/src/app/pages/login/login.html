@@ -1,0 +1,41 @@
+<div style="display: flex; min-height: 100vh; width: 100vw; margin: 0; padding: 0;">
+
+  <div style="flex: 6; background-image: url('https://images.unsplash.com/photo-1595349479366-419bba51bf87?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; position: relative;">
+    
+    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.3);"></div>
+  </div>
+
+  <div style="flex: 4; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #ffffff; padding: 40px; box-shadow: -10px 0px 20px rgba(0,0,0,0.05); z-index: 2;">
+    
+    <div style="width: 100%; max-width: 350px;">
+      
+      <h1 style="margin: 0 0 5px 0; color: #1a1a1a; text-align: center; font-size: 32px;">Los Corrales</h1>
+      <p style="color: #666; margin-bottom: 40px; text-align: center;">Acesso ao Sistema ERP</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" style="display: flex; flex-direction: column; gap: 20px;">
+        
+        <div>
+          <label style="font-size: 13px; color: #4a4a4a; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">E-mail Corporativo</label>
+          <input type="email" formControlName="email" placeholder="gerente@loscorrales.com" 
+                 style="width: 100%; padding: 14px; margin-top: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 15px; transition: border-color 0.3s;">
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between;">
+            <label style="font-size: 13px; color: #4a4a4a; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Senha</label>
+            <a href="#" style="font-size: 13px; color: #8B4513; text-decoration: none;">Esqueci a senha</a>
+          </div>
+          <input type="password" formControlName="password" placeholder="••••••••" 
+                 style="width: 100%; padding: 14px; margin-top: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 15px; transition: border-color 0.3s;">
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid" 
+                style="margin-top: 15px; padding: 16px; background: #1a1a1a; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.3s;">
+          Entrar
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+</div>
