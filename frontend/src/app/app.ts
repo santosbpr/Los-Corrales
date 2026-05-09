@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
-import { SidebarComponent } from './components/sidebar/sidebar';
+import { RouterOutlet, Router, NavigationEnd, RouterLink } from '@angular/router'; // Adicionado aqui
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ CommonModule, RouterOutlet /*SidebarComponent*/],
-  templateUrl: './app.html',
-  styleUrl: './app.scss'
+  imports: [CommonModule, RouterOutlet, RouterLink], // E adicionado aqui
+  templateUrl: './app.html'
 })
 export class AppComponent {
   showSidebar: boolean = true;

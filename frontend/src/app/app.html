@@ -1,11 +1,28 @@
 <div style="display: flex; min-height: 100vh;">
   
   @if (showSidebar) {
-    <div style="width: 250px; background-color: #1a1a1a; color: white;">
+    <div style="width: 250px; background-color: #1a1a1a; color: white; display: flex; flex-direction: column;">
+      
+      <div style="padding: 30px 20px; border-bottom: 1px solid #333;">
+        <h2 style="margin: 0; font-size: 22px; letter-spacing: 1px;">Los Corrales</h2>
       </div>
+
+      <nav style="display: flex; flex-direction: column; padding: 20px 10px; gap: 5px;">
+        <a routerLink="/dashboard" style="color: #ddd; text-decoration: none; padding: 12px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+          📊 Dashboard
+        </a>
+        <a routerLink="/products" style="color: #ddd; text-decoration: none; padding: 12px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+          📦 Estoque
+        </a>
+        <a style="color: #ddd; text-decoration: none; padding: 12px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; transition: background 0.3s;">
+          👤 Perfil
+        </a>
+      </nav>
+
+    </div>
   }
 
-  <div style="flex-grow: 1; width: 100%;">
+  <div style="flex-grow: 1; width: 100%; background-color: #ffffff;">
     <router-outlet></router-outlet>
   </div>
 
