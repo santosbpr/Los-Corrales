@@ -38,7 +38,8 @@ Para atender aos requisitos de escalabilidade e modernidade, o projeto foi const
 A solução foi arquitetada como uma aplicação web dividida em rotas públicas (Login) e rotas privadas (Dashboard e Estoque). O acesso inicial ocorre através de uma interface de "Split Screen", onde o usuário corporativo deve fornecer credenciais válidas. Uma vez autenticado, o sistema consome a API desenvolvida em Node.js para buscar e apresentar métricas atualizadas no Dashboard. A tela de gestão de estoque disponibiliza um ciclo completo de CRUD, com busca reativa no lado do cliente.
 
 A figura abaixo ilustra uma visão geral de solução
-![image](cole_aqui_o_link_do_print_da_sua_tela_de_estoque_ou_dashboard)
+<img width="1884" height="853" alt="Captura de tela 2026-05-09 202000" src="https://github.com/user-attachments/assets/3dd0a190-0401-4780-9b9e-cb602d6a5d2c" />
+
 
 Exemplo de código da Autenticação (Node.js + Supabase):
 ```javascript
