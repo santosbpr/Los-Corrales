@@ -13,12 +13,14 @@ export class AppComponent {
   showSidebar: boolean = true;
 
   constructor(private router: Router) {
-    // Aqui nós ficamos escutando a mudança de rotas no navegador
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      // Se a URL for a tela de login ou a raiz, a barra lateral fica invisível
-      this.showSidebar = event.url !== '/login' && event.url !== '/';
+      // MELHORIA: Usamos o urlAfterRedirects e o método .includes() 
+      // Isso evita que parâmetros extras na URL travem a lógica do menu
+      const currentUrl = event.urlAfterRedirects || event.url;
+      
+      this.showSidebar = !currentUrl.includes('/login') && currentUrl !== '/';
     });
   }
 }

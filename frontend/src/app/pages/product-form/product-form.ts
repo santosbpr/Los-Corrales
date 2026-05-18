@@ -1,13 +1,13 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-// 1. Importamos as ferramentas de Formulário
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { ProductService } from '../../services/product';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-product-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule], // 2. Ativamos elas aqui
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './product-form.html',
   styleUrl: './product-form.scss'
 })
@@ -31,7 +31,10 @@ export class ProductFormComponent {
     category: new FormControl('', Validators.required),
   });
 
-  constructor(private productService: ProductService) {}
+  constructor(
+    private productService: ProductService, 
+    private notificationService: NotificationService
+  ) {}
 
   // 4. A função que roda quando clicamos em "Salvar"
   onSubmit() {
@@ -50,15 +53,15 @@ export class ProductFormComponent {
       if (this.currentProductId) {
         this.productService.updateProduct(this.currentProductId, newProduct).subscribe({
           next: () => {
-            alert('Produto atualizado!');
+            this.notificationService.success('Produto atualizado com sucesso!');
             // Obs: A janela já vai fechar sozinha porque a lista está ouvindo o sinal!
           },
-          error: (err) => alert('Erro ao atualizar.')
+          error: (err) => this.notificationService.error('Erro ao atualizar produto.')
         });
       } else {
         this.productService.createProduct(newProduct).subscribe({
-          next: () => alert('Produto cadastrado com sucesso!'),
-          error: (err) => alert('Erro ao salvar produto.')
+          next: () => this.notificationService.success('Produto cadastrado com sucesso!'),
+          error: (err) => this.notificationService.error('Erro ao salvar produto.')
         });
       }
     } else {

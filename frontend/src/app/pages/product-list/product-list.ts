@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ProductService } from '../../services/product'; // Ajustado para o nome curto
 import { ProductFormComponent } from '../product-form/product-form';
 import { FormsModule } from '@angular/forms';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-product-list',
@@ -17,6 +18,11 @@ export class ProductListComponent implements OnInit {
   productToEdit: any = null; //Guarda o produto selecionado para edição
   searchTerm: string = ''; // Variável para armazenar o termo de busca
 
+  constructor(
+    private productService: ProductService,
+    private cdRef: ChangeDetectorRef,
+    private notificationService: NotificationService
+    ) {}
 
   // Função para filtrar os produtos com base no termo de busca
   get filteredProducts() {
@@ -44,17 +50,22 @@ export class ProductListComponent implements OnInit {
   }
 
   // Função para deletar um produto, confirmando a ação com o usuário
-  deleteProduct(id: string | number) {
-    if (confirm('Tem certeza que deseja deletar este produto?')) {
-      this.productService.deleteProduct(id).subscribe({
-        next: () => console.log('Produto deletado com sucesso!'),
-        error: (err) => console.error('Erro ao deletar produto:', err)
-      });
-    }
+  deleteProduct(id: number, name: string = 'este item') {
+    this.notificationService.confirmDelete(name).then((result) => {
+      // Se o usuário clicar no botão vermelho "Sim, excluir!" do pop-up bonitão
+      if (result.isConfirmed) {
+        this.productService.deleteProduct(id).subscribe({
+          next: () => {
+            this.notificationService.success('Produto removido com sucesso!');
+            this.loadData(); // <-- CORRIGIDO: mudamos de loadProducts para loadData
+          },
+          error: () => {
+            this.notificationService.error('Não foi possível excluir o produto.');
+          }
+        });
+      }
+    }); // <-- CORRIGIDO: Faltava fechar o parêntese do .then() aqui
   }
-
-
-  constructor(private productService: ProductService, private cdRef: ChangeDetectorRef) {}
 
   ngOnInit(): void {
     // Carrega os produtos qnd inicializado

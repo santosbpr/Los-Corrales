@@ -46,4 +46,10 @@ export class ProductService {
       })
     );
   }
+
+  //Registra uma venda, enviando o ID do produto e os dados da venda (variante e quantidade)
+  registerSale(id: number | string, saleData: { variantIndex: number, quantity: number }) {
+    // Garanta que a URL bate com a do seu back-end (ex: http://localhost:3000/api/products)
+    return this.http.post(`${this.apiUrl}/${id}/sell`, saleData);
+  }
 }

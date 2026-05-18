@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
   selector: 'app-login',
@@ -16,18 +17,22 @@ export class LoginComponent {
     password: new FormControl('', Validators.required)
   });
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private notificationService: NotificationService) {}
 
   onSubmit() {
     if (this.loginForm.valid) {
       this.authService.login(this.loginForm.value).subscribe({
         next: () => {
-          // Login deu certo! Manda o gerente pro Dashboard.
+          // Toast de sucesso bonito!
+          this.notificationService.success('Bem-vindo ao Los Corrales!');
           this.router.navigate(['/dashboard']);
         },
         error: (err) => {
-          // Temporário até colocarmos nossos Toasts bonitões!
-          alert('Erro: ' + (err.error?.message || 'Falha ao fazer login'));
+          // Toast de erro elegante em vez do alert do navegador!
+          this.notificationService.error(err.error?.message || 'Falha ao fazer login');
         }
       });
     } else {
