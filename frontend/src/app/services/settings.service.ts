@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class SettingsService {
   // Ajuste a porta se o seu back-end rodar em outra (ex: 3000)
-  private apiUrl = 'http://localhost:3000/api/settings'; 
+  private apiUrl = 'https://los-corrales-api.onrender.com/api/settings'; 
 
   constructor(private http: HttpClient) {}
 

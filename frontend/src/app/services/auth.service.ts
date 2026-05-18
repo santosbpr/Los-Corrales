@@ -7,7 +7,7 @@ import { tap } from 'rxjs/operators';
 })
 export class AuthService {
   // Ajuste a porta se o seu Node estiver rodando em uma diferente de 3000
-  private apiUrl = 'http://localhost:3000/api/auth';
+  private apiUrl = 'https://los-corrales-api.onrender.com/api/auth';
 
   constructor(private http: HttpClient) {}
 

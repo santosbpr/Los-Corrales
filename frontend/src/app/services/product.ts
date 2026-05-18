@@ -6,7 +6,7 @@ import { Observable, Subject, tap } from 'rxjs';
   providedIn: 'root'
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:3000/api/products';
+  private apiUrl = 'https://los-corrales-api.onrender.com/api/products';
 
   //canal que atualiza a lista de produtos
   private _refreshNeeded$ = new Subject<void>();
