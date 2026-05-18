@@ -2,6 +2,7 @@
 #### Sistema de Gestão de Estoque e Movimentações
 
 Breno Prado Dos Santos
+Miguel Fraga Machado
 
 Este artigo tem como objetivo ilustrar a documentação de um projeto final na unidade curricular Projeto de Desenvolvimento II dos cursos Análise e Desenvolvimento de Sistemas, Sistemas para Internet e Ciência de Dados e Inteligência Analítica do Centro Universitário Senac-RS.
 
