@@ -1,36 +1,51 @@
-<form [formGroup]="productForm" (ngSubmit)="onSubmit()">
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()" style="display: flex; flex-direction: column; gap: 15px;">
   
-  <div style="margin-bottom: 15px;">
-    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Nome do Produto <span style="color: red;">*</span></label>
-    <input type="text" formControlName="name" placeholder="Ex: Calça Jeans Flare" 
-           style="width: 100%; padding: 8px; border-radius: 4px;"
-           [style.border]="productForm.get('name')?.invalid && productForm.get('name')?.touched ? '1px solid red' : '1px solid #ccc'">
-    
-    @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
-      <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">
-        O nome do produto é obrigatório.
-      </span>
-    }
+  <div>
+    <label style="font-size: 14px; font-weight: bold; color: #333;">Nome do Produto</label>
+    <input type="text" formControlName="name" placeholder="Ex: Camisa Polo Pampa"
+           style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
   </div>
 
-  <div style="margin-bottom: 15px;">
-    <label style="font-weight: bold; display: block; margin-bottom: 5px;">Categoria <span style="color: red;">*</span></label>
-    <input type="text" formControlName="category" placeholder="Ex: Calças" 
-           style="width: 100%; padding: 8px; border-radius: 4px;"
-           [style.border]="productForm.get('category')?.invalid && productForm.get('category')?.touched ? '1px solid red' : '1px solid #ccc'">
-    
-    @if (productForm.get('category')?.invalid && productForm.get('category')?.touched) {
-      <span style="color: red; font-size: 12px; margin-top: 4px; display: block;">
-        A categoria é obrigatória.
-      </span>
-    }
+  <div>
+    <label style="font-size: 14px; font-weight: bold; color: #333;">Categoria</label>
+    <select formControlName="category" 
+            style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+      <option value="" disabled selected>Selecione uma categoria...</option>
+      <option *ngFor="let cat of availableCategories" [value]="cat.name">{{ cat.name }}</option>
+    </select>
   </div>
 
-  <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
-    <button type="submit" 
-            [style.opacity]="productForm.invalid ? '0.5' : '1'"
-            style="padding: 10px 20px; background: #000; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
-      Salvar Produto
-    </button>
+  <div style="display: flex; gap: 15px;">
+    
+    <div style="flex: 1;">
+      <label style="font-size: 14px; font-weight: bold; color: #333;">Cor Oficial</label>
+      <select formControlName="color" 
+              style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+        <option value="" disabled selected>Selecione a cor...</option>
+        <option *ngFor="let c of availableColors" [value]="c.name">{{ c.name }}</option>
+      </select>
+    </div>
+
+    <div style="flex: 1;">
+      <label style="font-size: 14px; font-weight: bold; color: #333;">Tamanho</label>
+      <select formControlName="size" 
+              style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+        <option value="" disabled selected>Selecione o tamanho...</option>
+        <option *ngFor="let s of availableSizes" [value]="s.name">{{ s.name }}</option>
+      </select>
+    </div>
+
+    <div style="flex: 1;">
+      <label style="font-size: 14px; font-weight: bold; color: #333;">Estoque (Qtd)</label>
+      <input type="number" formControlName="stock" min="0"
+             style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+    </div>
+
   </div>
+
+  <button type="submit" [disabled]="productForm.invalid"
+          style="margin-top: 15px; padding: 12px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer;">
+    Salvar Produto
+  </button>
+  
 </form>

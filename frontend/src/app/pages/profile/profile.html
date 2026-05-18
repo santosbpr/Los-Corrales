@@ -1,0 +1,86 @@
+<div style="font-family: Arial, sans-serif; padding: 30px; background-color: #f8f9fa; min-height: 100vh;">
+  
+  <h2 style="margin-bottom: 5px; color: #1a1a1a;">⚙️ Configurações globais do ERP</h2>
+  <p style="color: #666; margin-bottom: 30px; font-size: 14px;">Gerencie as propriedades oficiais dos itens de vestuário da Los Corrales</p>
+  
+  <hr style="border: 0; border-top: 1px solid #ddd; margin-bottom: 30px;">
+
+  <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+    
+    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
+      <h3 style="margin-top: 0; color: #333; font-size: 16px;">🎨 Paleta de Cores Disponíveis</h3>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 20px; margin-top: 15px;">
+        <input type="text" [(ngModel)]="newColorName" placeholder="Ex: Vermelho Campeiro"
+               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none;">
+        <button (click)="salvarCor()" style="padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+          + Adicionar
+        </button>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr style="background: #f1f1f1; text-align: left;">
+          <th style="padding: 10px; border-bottom: 2px solid #ddd;">Nome da Cor</th>
+          <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right;">Ações</th>
+        </tr>
+        <tr *ngFor="let c of colors" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 10px; color: #555; font-weight: 500;">{{ c.name }}</td>
+          <td style="padding: 10px; text-align: right;">
+            <button (click)="excluirCor(c.id, c.name)" style="background: transparent; border: none; cursor: pointer; font-size: 16px;" title="Remover">🗑️</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
+      <h3 style="margin-top: 0; color: #333; font-size: 16px;">📏 Grade de Tamanhos (Numeração/Letras)</h3>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 20px; margin-top: 15px;">
+        <input type="text" [(ngModel)]="newSizeName" placeholder="Ex: GG ou 42"
+               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none;">
+        <button (click)="salvarTamanho()" style="padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+          + Adicionar
+        </button>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr style="background: #f1f1f1; text-align: left;">
+          <th style="padding: 10px; border-bottom: 2px solid #ddd;">Tamanho</th>
+          <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right;">Ações</th>
+        </tr>
+        <tr *ngFor="let s of sizes" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 10px; color: #555; font-weight: bold;">{{ s.name }}</td>
+          <td style="padding: 10px; text-align: right;">
+            <button (click)="excluirTamanho(s.id, s.name)" style="background: transparent; border: none; cursor: pointer; font-size: 16px;" title="Remover">🗑️</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
+      <h3 style="margin-top: 0; color: #333; font-size: 16px;"> Grade de Categorias</h3>
+      
+      <div style="display: flex; gap: 10px; margin-bottom: 20px; margin-top: 15px;">
+        <input type="text" [(ngModel)]="newCategoryName" placeholder="Ex: Calçados, Camisas, Acessórios etc."
+               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none;">
+        <button (click)="salvarCategoria()" style="padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+          + Adicionar
+        </button>
+      </div>
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr style="background: #f1f1f1; text-align: left;">
+          <th style="padding: 10px; border-bottom: 2px solid #ddd;">Categoria</th>
+          <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right;">Ações</th>
+        </tr>
+        <tr *ngFor="let c of categories" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 10px; color: #555; font-weight: bold;">{{ c.name }}</td>
+          <td style="padding: 10px; text-align: right;">
+            <button (click)="excluirCategoria(c.id, c.name)" style="background: transparent; border: none; cursor: pointer; font-size: 16px;" title="Remover">🗑️</button>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+</div>
