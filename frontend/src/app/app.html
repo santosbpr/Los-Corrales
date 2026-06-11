@@ -1,3 +1,26 @@
+<style>
+  .menu-link {
+    color: #ddd;
+    text-decoration: none;
+    padding: 12px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    display: block;
+    border-left: 3px solid transparent; /* Esconde a barra por defeito */
+    transition: 0.2s;
+  }
+  .menu-link:hover {
+    background-color: #2a2a2a;
+    color: #fff;
+  }
+  .active-link {
+    color: #fff !important;
+    background-color: #2a2a2a;
+    border-left: 3px solid #28a745 !important; /* A barra verde mágica aparece aqui! */
+  }
+</style>
+
 <div style="display: flex; min-height: 100vh;">
   
   @if (showSidebar) {
@@ -8,17 +31,23 @@
       </div>
 
       <nav style="display: flex; flex-direction: column; padding: 20px 10px; gap: 5px;">
-        <a routerLink="/dashboard" style="color: #ddd; text-decoration: none; padding: 12px 15px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+        <a routerLink="/dashboard" routerLinkActive="active-link" class="menu-link">
           📊 Dashboard
         </a>
-        <a routerLink="/products" style="color: #ddd; text-decoration: none; padding: 12px 15px; border-radius: 5px; font-weight: bold; cursor: pointer;">
+        <a routerLink="/finance" routerLinkActive="active-link" class="menu-link">
+          💰 Financeiro (Caixa)
+        </a>
+        <a routerLink="/products" routerLinkActive="active-link" class="menu-link">
           📦 Estoque
         </a>
-        <a routerLink="/pdv" style="color: #ddd; text-decoration: none; padding: 12px 15px; border-radius: 5px; font-weight: bold; cursor: pointer; border-left: 3px solid #28a745;">
-            🛒 Frente de Caixa (PDV)
+        <a routerLink="/pdv" routerLinkActive="active-link" class="menu-link">
+          🛒 Frente de Caixa (PDV)
         </a>
-        <a routerLink="/profile" style="color: #ddd; text-decoration: none; padding: 12px 15px; border-radius: 5px; font-weight: bold; cursor: pointer;">
-          ⚙️ Configurações (Perfil)
+        <a routerLink="/crm" routerLinkActive="active-link" class="menu-link">
+          👥 CRM (Clientes)
+        </a>
+        <a routerLink="/profile" routerLinkActive="active-link" class="menu-link">
+          ⚙️ Configurações
         </a>
       </nav>
 

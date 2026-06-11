@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product';
 import { NotificationService } from '../../services/notification.service';
+import { HardwareService } from '../../services/hardware.service';
 
 @Component({
   selector: 'app-pdv',
@@ -15,10 +16,12 @@ export class PdvComponent implements OnInit {
   selectedProduct: any = null;
   selectedVariantIndex: number = 0;
   quantity: number = 1;
+  scannedCode: string = '';
 
   constructor(
     private productService: ProductService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private hardwareService: HardwareService
   ) {}
 
   ngOnInit() {
@@ -66,6 +69,24 @@ export class PdvComponent implements OnInit {
       },
       error: (err) => {
         this.notification.error(err.error?.message || 'Erro ao processar a venda.');
+      }
+    });
+  }
+  processarLeitura() {
+    if (!this.scannedCode.trim()) return;
+
+    this.hardwareService.processScan(this.scannedCode).subscribe({
+      next: (response) => {
+        // Se a API validar a leitura, a venda foi feita, o stock caiu e o caixa subiu!
+        alert(`✅ Sucesso! ${response.product_name} vendido via hardware. Stock restante: ${response.stock_remaining}`);
+        
+        // Limpa o campo para o próximo "bip" do leitor
+        this.scannedCode = ''; 
+      },
+      error: (err) => {
+        // Mostra o erro exato que o nosso Back-end enviou (ex: "Produto não cadastrado" ou "Estoque insuficiente")
+        alert(`❌ Erro na leitura: ${err.error?.message || 'Falha ao processar.'}`);
+        this.scannedCode = ''; 
       }
     });
   }

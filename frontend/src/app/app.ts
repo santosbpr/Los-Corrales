@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet, Router, NavigationEnd, RouterLink } from '@angular/router'; // Adicionado aqui
+import { RouterOutlet, Router, NavigationEnd, RouterLink, RouterLinkActive } from '@angular/router'; // <-- RouterLinkActive adicionado
 import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink], // E adicionado aqui
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive], // <-- RouterLinkActive adicionado
   templateUrl: './app.html'
 })
 export class AppComponent {
@@ -16,10 +16,7 @@ export class AppComponent {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: any) => {
-      // MELHORIA: Usamos o urlAfterRedirects e o método .includes() 
-      // Isso evita que parâmetros extras na URL travem a lógica do menu
       const currentUrl = event.urlAfterRedirects || event.url;
-      
       this.showSidebar = !currentUrl.includes('/login') && currentUrl !== '/';
     });
   }

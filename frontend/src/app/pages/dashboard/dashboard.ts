@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../../services/product';
+import { DashboardService } from '../../services/dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -9,35 +9,31 @@ import { ProductService } from '../../services/product';
   templateUrl: './dashboard.html'
 })
 export class DashboardComponent implements OnInit {
-  totalProducts: number = 0;
-  totalCategories: number = 0;
+  totalRevenue: number = 0;
+  totalItemsSold: number = 0;
+  lowStockItems: any[] = [];
 
   constructor(
-    private productService: ProductService,
-    private cdr: ChangeDetectorRef) {}
+    private dashboardService: DashboardService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
-    console.log("👉 1. Dashboard carregou! Pedindo dados ao Back-end...");
+    this.loadDashboardData();
+  }
 
-    this.productService.getProducts().subscribe({
-      next: (products) => {
-        console.log("👉 2. Resposta do Supabase chegou:", products);
-
-        // Garantimos que a resposta é um array antes de contar
-        if (products && Array.isArray(products)) {
-          this.totalProducts = products.length;
-          
-          const categories = products.map(p => p.category);
-          this.totalCategories = new Set(categories).size;
-
-          console.log(`👉 3. Matemática feita: ${this.totalProducts} produtos, ${this.totalCategories} categorias.`);
-
-          // 2. O PULO DO GATO: Mandamos o Angular redesenhar o HTML na mesma hora!
-          this.cdr.detectChanges();
-        }
+  loadDashboardData() {
+    this.dashboardService.getSummary().subscribe({
+      next: (data) => {
+        this.totalRevenue = data.totalRevenue || 0;
+        this.totalItemsSold = data.totalItemsSold || 0;
+        this.lowStockItems = data.lowStockItems || [];
+        
+        // Manda o Angular redesenhar o ecrã com os novos números
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('🚨 Erro ao buscar produtos para o Dashboard:', err);
+        console.error('🚨 Erro ao carregar o dashboard:', err);
       }
     });
   }

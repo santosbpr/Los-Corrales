@@ -1,27 +1,37 @@
-<nav class="sidebar">
-  <div class="logo">
-    <h2>Los Corrales</h2>
-  </div>
+<div class="sidebar-container" style="background-color: #1a1a1a; min-height: 100vh; width: 250px; padding: 20px 10px; box-sizing: border-box;">
+  <h3 style="color: #fff; margin-left: 15px; margin-bottom: 30px; font-family: Arial, sans-serif;">Los Corrales</h3>
+  
+  <div style="display: flex; flex-direction: column; gap: 8px;">
+    
+    <a routerLink="/pdv" 
+       routerLinkActive="active-item" 
+       class="menu-link">
+       🛒 Frente de Caixa
+    </a>
 
-  <ul class="nav-links">
-    <li>
-      <a routerLink="/dashboard" routerLinkActive="active-link">
-        <i class="icon">📊</i> Dashboard
-      </a>
-    </li>
-    <li>
-      <a routerLink="/stock" routerLinkActive="active-link">
-        <i class="icon">📦</i> Stock
-      </a>
-    </li>
-    <li>
-      <a routerLink="/perfil" routerLinkActive="active-link">
-        <i class="icon">👤</i> Perfil
-      </a>
-    </li>
-  </ul>
+    <a routerLink="/products" 
+       routerLinkActive="active-item" 
+       class="menu-link">
+       📦 Estoque de Produtos
+    </a>
 
-  <div class="sidebar-footer">
-    <button class="btn-theme">Personalizar Cores</button>
+    <a routerLink="/crm" 
+       routerLinkActive="active-item" 
+       class="menu-link">
+       👥 CRM (Clientes)
+    </a>
+
+    <a routerLink="/dashboard" 
+       routerLinkActive="active-item" 
+       class="menu-link">
+       📊 Dashboard
+    </a>
+
+    <a routerLink="/settings" 
+       routerLinkActive="active-item" 
+       class="menu-link">
+       ⚙️ Configurações
+    </a>
+
   </div>
-</nav>
+</div>
