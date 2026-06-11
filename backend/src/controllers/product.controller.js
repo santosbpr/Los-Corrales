@@ -74,7 +74,8 @@ const ProductController = {
           product_id: id,
           product_name: product.name,
           variant_info: variantDetails,
-          quantity: quantity
+          quantity: quantity,
+          customer_id: customerId
         }]);
 
       if (saleError) console.error("Aviso: Venda feita, mas erro ao salvar histórico:", saleError);

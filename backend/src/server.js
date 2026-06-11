@@ -4,6 +4,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth.routes');
 const productRoutes = require('./routes/products.routes');
 const settingsRoutes = require('./routes/settings.route');
+const customerRoutes = require('./routes/customers.routes');
 
 // 1. Inicializa o aplicativo Express (O "app" nasce aqui!)
 const app = express();
@@ -32,5 +33,8 @@ app.listen(PORT, () => {
 
 // 6. Rota de Configurações (Settings) - Importante: Deve ser a última para evitar conflitos
 app.use('/api/settings', settingsRoutes);
+
+// 7. Rota de Clientes (Customer) - Importante: Deve ser a última para evitar conflitos
+app.use('/api/customers', customerRoutes);
 
 module.exports = app;
