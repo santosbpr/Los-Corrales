@@ -5,6 +5,7 @@ const authRoutes = require('./routes/auth.routes');
 const productRoutes = require('./routes/products.routes');
 const settingsRoutes = require('./routes/settings.route');
 const customerRoutes = require('./routes/customers.routes');
+const financeRoutes = require('./routes/finance.routes');
 
 // 1. Inicializa o aplicativo Express (O "app" nasce aqui!)
 const app = express();
@@ -31,10 +32,14 @@ app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-// 6. Rota de Configurações (Settings) - Importante: Deve ser a última para evitar conflitos
-app.use('/api/settings', settingsRoutes);
+// 6. Rota de Finanças (Finance) - Importante: Deve ser a última para evitar conflitos
+app.use('/api/finance', financeRoutes);
 
 // 7. Rota de Clientes (Customer) - Importante: Deve ser a última para evitar conflitos
 app.use('/api/customers', customerRoutes);
+
+// 8. Rota de Configurações (Settings) - Importante: Deve ser a última para evitar conflitos
+app.use('/api/settings', settingsRoutes);
+
 
 module.exports = app;

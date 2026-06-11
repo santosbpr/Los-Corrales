@@ -80,6 +80,24 @@ const ProductController = {
 
       if (saleError) console.error("Aviso: Venda feita, mas erro ao salvar histórico:", saleError);
 
+      // ==========================================
+      // 5. AUTOMAÇÃO FINANCEIRA
+      // ==========================================
+      // Verifica se o produto tem preço cadastrado. Se tiver, lança no caixa!
+      if (product.price && product.price > 0) {
+        const totalValue = product.price * quantity;
+        
+        const { error: financeError } = await supabase
+          .from('financial_transactions')
+          .insert([{
+            type: 'ENTRADA',
+            amount: totalValue,
+            description: `Venda Automática: ${quantity}x ${product.name}`
+          }]);
+          
+        if (financeError) console.error("Aviso: Erro ao lançar no financeiro:", financeError);
+      }
+
       return res.status(200).json({ message: 'Venda registrada com sucesso e gravada no histórico!' });
 
     } catch (err) {
