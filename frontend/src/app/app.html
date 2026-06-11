@@ -1,4 +1,5 @@
 <style>
+  /* ESTILOS DOS LINKS */
   .menu-link {
     color: #ddd;
     text-decoration: none;
@@ -7,8 +8,9 @@
     font-weight: bold;
     cursor: pointer;
     display: block;
-    border-left: 3px solid transparent; /* Esconde a barra por defeito */
-    transition: 0.2s;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease-in-out;
+    font-family: Arial, sans-serif;
   }
   .menu-link:hover {
     background-color: #2a2a2a;
@@ -17,44 +19,121 @@
   .active-link {
     color: #fff !important;
     background-color: #2a2a2a;
-    border-left: 3px solid #28a745 !important; /* A barra verde mágica aparece aqui! */
+    border-left: 3px solid #28a745 !important;
+  }
+
+  /* ESTILOS DE LAYOUT (PC E TELEMÓVEL) */
+  .layout-container {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: row; /* Lado a lado no PC */
+  }
+  .sidebar-container {
+    width: 250px;
+    background-color: #1a1a1a;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease; /* Animação suave no telemóvel */
+  }
+  .main-content {
+    flex-grow: 1;
+    width: 100%;
+    background-color: #ffffff;
+    overflow-x: hidden;
+  }
+  .mobile-topbar {
+    display: none; /* Escondido no PC */
+    background-color: #1a1a1a;
+    color: white;
+    padding: 15px 20px;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  }
+  .hamburger-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  .overlay {
+    display: none;
+  }
+
+  /* MEDIA QUERY: SÓ SE APLICA EM TELEMÓVEIS (ATÉ 768px) */
+  @media (max-width: 768px) {
+    .layout-container {
+      flex-direction: column; /* Fica um em cima do outro */
+    }
+    .mobile-topbar {
+      display: flex; /* Mostra a barra preta no topo */
+    }
+    .sidebar-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      z-index: 1000;
+      transform: translateX(-100%); /* Esconde a barra lateral puxando-a para a esquerda */
+    }
+    .sidebar-container.open {
+      transform: translateX(0); /* Empurra a barra lateral de volta para o ecrã */
+    }
+    .overlay.show {
+      display: block;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999; /* Fica atrás do menu mas à frente do ecrã */
+    }
   }
 </style>
 
-<div style="display: flex; min-height: 100vh;">
+<div class="layout-container">
   
+  @if (showSidebar && isMobile) {
+    <div class="mobile-topbar">
+      <h2 style="margin: 0; font-size: 20px; letter-spacing: 1px;">Los Corrales</h2>
+      <button class="hamburger-btn" (click)="toggleMobileMenu()">☰</button>
+    </div>
+    
+    <div class="overlay" [class.show]="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
+  }
+
   @if (showSidebar) {
-    <div style="width: 250px; background-color: #1a1a1a; color: white; display: flex; flex-direction: column;">
+    <div class="sidebar-container" [class.open]="mobileMenuOpen">
       
-      <div style="padding: 30px 20px; border-bottom: 1px solid #333;">
+      <div style="padding: 30px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
         <h2 style="margin: 0; font-size: 22px; letter-spacing: 1px;">Los Corrales</h2>
+        
+        @if (isMobile) {
+          <button class="hamburger-btn" style="font-size: 20px;" (click)="toggleMobileMenu()">✕</button>
+        }
       </div>
 
       <nav style="display: flex; flex-direction: column; padding: 20px 10px; gap: 5px;">
-        <a routerLink="/dashboard" routerLinkActive="active-link" class="menu-link">
-          📊 Dashboard
-        </a>
-        <a routerLink="/finance" routerLinkActive="active-link" class="menu-link">
-          💰 Financeiro (Caixa)
-        </a>
-        <a routerLink="/products" routerLinkActive="active-link" class="menu-link">
-          📦 Estoque
-        </a>
-        <a routerLink="/pdv" routerLinkActive="active-link" class="menu-link">
-          🛒 Frente de Caixa (PDV)
-        </a>
-        <a routerLink="/crm" routerLinkActive="active-link" class="menu-link">
-          👥 CRM (Clientes)
-        </a>
-        <a routerLink="/profile" routerLinkActive="active-link" class="menu-link">
-          ⚙️ Configurações
-        </a>
+        
+        @if (userRole === 'CASHIER' || userRole === 'ADMIN') {
+          <a routerLink="/products" routerLinkActive="active-link" class="menu-link">📦 Estoque</a>
+        <a routerLink="/pdv" routerLinkActive="active-link" class="menu-link">🛒 Frente de Caixa (PDV)</a>
+        }
+        
+        @if (userRole === 'ADMIN') {
+          <a routerLink="/dashboard" routerLinkActive="active-link" class="menu-link">📊 Dashboard</a>
+          <a routerLink="/crm" routerLinkActive="active-link" class="menu-link">👥 CRM (Clientes)</a>
+          <a routerLink="/finance" routerLinkActive="active-link" class="menu-link">💰 Financeiro (Caixa)</a>
+          <a routerLink="/profile" routerLinkActive="active-link" class="menu-link">⚙️ Configurações (Perfil)</a>
+        }
+        
+        <a routerLink="/login" (click)="sair()" style="margin-top: 20px; color: #dc3545;" class="menu-link">🚪 Sair do Sistema</a>
       </nav>
 
     </div>
   }
 
-  <div style="flex-grow: 1; width: 100%; background-color: #ffffff;">
+  <div class="main-content">
     <router-outlet></router-outlet>
   </div>
 

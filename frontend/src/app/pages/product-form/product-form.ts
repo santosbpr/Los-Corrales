@@ -17,13 +17,15 @@ export class ProductFormComponent implements OnInit {
   @Output() productSaved = new EventEmitter<void>();
 
   availableColors: any[] = [];
-  availableSizes: any[] = [];
   availableCategories: any[] = [];
+  
+  // Novas variáveis para a magia do filtro
+  allSizes: any[] = [];
+  filteredSizes: any[] = []; 
 
   @Input() set product(val: any) {
     if (val) {
       this.currentProductId = val.id;
-      // Preenche os campos "desempacotando" a primeira variante do array
       this.productForm.patchValue({
         name: val.name,
         category: val.category,
@@ -32,13 +34,11 @@ export class ProductFormComponent implements OnInit {
         stock: val.variants && val.variants.length > 0 ? val.variants[0].stock : 0
       });
     } else {
-      this.productForm.reset({ stock: 1 }); // Valor padrão do estoque
+      this.productForm.reset({ stock: 1 });
       this.currentProductId = null;
     }
-
   }
 
-  // 3. Criamos o nosso formulário com regras (campos obrigatórios)
   productForm = new FormGroup({
     name: new FormControl('', Validators.required),
     category: new FormControl('', Validators.required),
@@ -54,39 +54,67 @@ export class ProductFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // Carrega as opções de CORES para os selects
     this.settingsService.getColors().subscribe({
       next: (data) => this.availableColors = data,
       error: () => this.notificationService.error('Erro ao carregar paleta de cores.')
     });
 
-    // Carrega as opções de TAMANHOS para os selects
-    this.settingsService.getSizes().subscribe({
-      next: (data) => this.availableSizes = data,
-      error: () => this.notificationService.error('Erro ao carregar grade de tamanhos.')
-    });
-
-    // Carrega as opções de CATEGORIAS para os selects
     this.settingsService.getCategories().subscribe({
       next: (data) => this.availableCategories = data,
       error: () => this.notificationService.error('Erro ao carregar categorias oficiais.')
     });
+
+    // Carrega todos os tamanhos e inicializa a lista filtrada
+    this.settingsService.getSizes().subscribe({
+      next: (data) => {
+        this.allSizes = data;
+        this.filteredSizes = data; 
+      },
+      error: () => this.notificationService.error('Erro ao carregar grade de tamanhos.')
+    });
+
+    // O "Espião": Observa sempre que o campo Categoria for alterado!
+    this.productForm.get('category')?.valueChanges.subscribe(categoriaSelecionada => {
+      this.filtrarTamanhosPorCategoria(categoriaSelecionada);
+    });
   }
 
-  // 4. A função que roda quando clicamos em "Salvar"
+  filtrarTamanhosPorCategoria(categoria: string | null) {
+    if (!categoria) {
+      this.filteredSizes = this.allSizes;
+      return;
+    }
+
+    const catTexto = categoria.toLowerCase();
+    
+    // Regras de negócio inteligentes baseadas em palavras-chave
+    const usarNumeros = ['calça', 'calca', 'bermuda', 'short'].some(palavra => catTexto.includes(palavra));
+    const usarLetras = ['camisa', 'camiseta', 'jaqueta', 'casaco', 'moletom'].some(palavra => catTexto.includes(palavra));
+
+    this.filteredSizes = this.allSizes.filter(size => {
+      // Tenta converter o nome do tamanho para um número
+      const isNumero = !isNaN(Number(size.name)); 
+      
+      if (usarNumeros) return isNumero;
+      if (usarLetras) return !isNumero;
+      return true; // Se for uma categoria diferente, mostra todos
+    });
+
+    // Limpa o campo de tamanho sempre que a categoria mudar para evitar enviar um tamanho errado
+    this.productForm.patchValue({ size: '' });
+  }
+
   onSubmit() {
     if (this.productForm.valid) {
       const formValues = this.productForm.value;
 
-      // Como o nosso back-end exige a propriedade "variants", 
-      // vamos injetar uma variante padrão invisível por enquanto para o cadastro não falhar.
       const newProduct = {
         name: formValues.name,
         category: formValues.category,
         description: "Produto cadastrado via sistema",
         variants: [
           {
-            sku: "SKU-" + Math.floor(Math.random() * 10000), // Gera um código único aleatório
+            sku: "SKU-" + Math.floor(Math.random() * 10000),
             color: formValues.color,
             size: formValues.size,
             stock: formValues.stock
@@ -108,7 +136,7 @@ export class ProductFormComponent implements OnInit {
             this.notificationService.success('Produto cadastrado com sucesso!');
             this.productSaved.emit();
           },
-          error: () => this.notificationService.error('Erro ao salvar produto.')
+          error: () => this.notificationService.error('Erro ao guardar produto.')
         });
       }
     } else {

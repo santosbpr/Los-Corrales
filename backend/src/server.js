@@ -24,6 +24,7 @@ app.use('/api/hardware', hardwareRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/auth', authRoutes);
 
 // 4. Rota de teste (Health Check)
 app.get('/', (req, res) => {

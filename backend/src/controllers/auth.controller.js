@@ -22,7 +22,36 @@ const AuthController = {
                 email: data.user.email
             }
         });
+    },
+
+    async register(req, res) {
+        const { email, password, role } = req.body;
+
+        // Registo no Supabase
+        const { data, error } = await supabase.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+                data: { role: role || 'CAIXA' } // Guarda o cargo no perfil do utilizador
+            }
+        });
+
+        if (error) {
+            return res.status(400).json({ message: error.message });
+        }
+
+        return res.status(201).json({
+            message: 'Utilizador criado com sucesso',
+            user: {
+                id: data.user.id,
+                email: data.user.email,
+                role: data.user.user_metadata.role
+            }
+        });
     }
 };
 
-module.exports = AuthController;
+module.exports = {
+    login: AuthController.login,
+    register: AuthController.register
+};

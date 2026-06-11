@@ -82,5 +82,38 @@
       </table>
     </div>
 
+    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
+      <h3 style="margin-top: 0; color: #333; font-size: 16px;">👥 Registar Novo Funcionário</h3>
+      <p style="color: #666; font-size: 12px; margin-bottom: 15px;">Crie acessos para a sua equipa (Caixa ou Administrador).</p>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        
+        <div>
+          <label style="font-size: 12px; font-weight: bold; color: #555;">E-mail do Funcionário</label>
+          <input type="email" [(ngModel)]="newUser.email" placeholder="caixa@loscorrales.com"
+                 style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; outline: none; box-sizing: border-box;">
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: bold; color: #555;">Palavra-passe provisória</label>
+          <input type="password" [(ngModel)]="newUser.password" placeholder="••••••••"
+                 style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; outline: none; box-sizing: border-box;">
+        </div>
+
+        <div>
+          <label style="font-size: 12px; font-weight: bold; color: #555;">Nível de Acesso (Cargo)</label>
+          <select [(ngModel)]="newUser.role" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; outline: none; box-sizing: border-box;">
+            <option value="CAIXA">Operador de Caixa (Vendas apenas)</option>
+            <option value="ADMIN">Administrador (Acesso Total)</option>
+          </select>
+        </div>
+
+        <button (click)="salvarUtilizador()" style="margin-top: 10px; padding: 12px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
+          Registar Utilizador
+        </button>
+
+      </div>
+    </div>
+
   </div>
 </div>

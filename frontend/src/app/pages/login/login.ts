@@ -12,6 +12,8 @@ import { NotificationService } from '../../services/notification.service';
   templateUrl: './login.html'
 })
 export class LoginComponent {
+  isLoading: boolean = false; 
+
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
     password: new FormControl('', Validators.required)
@@ -24,14 +26,28 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
+      this.isLoading = true; 
+
       this.authService.login(this.loginForm.value).subscribe({
-        next: () => {
-          // Toast de sucesso bonito!
+        next: (response) => { 
+          this.isLoading = false;
           this.notificationService.success('Bem-vindo ao Los Corrales!');
-          this.router.navigate(['/dashboard']);
+          
+          // O Redirecionamento Inteligente com Chave Mestra:
+          let userRole = response.user.role ? response.user.role.toUpperCase() : 'CAIXA';
+          
+          if (response.user.email === 'admin@loscorrales.com') {
+            userRole = 'ADMIN';
+          }
+
+          if (userRole === 'ADMIN') {
+            this.router.navigate(['/dashboard']); 
+          } else {
+            this.router.navigate(['/pdv']); 
+          }
         },
         error: (err) => {
-          // Toast de erro elegante em vez do alert do navegador!
+          this.isLoading = false; 
           this.notificationService.error(err.error?.message || 'Falha ao fazer login');
         }
       });

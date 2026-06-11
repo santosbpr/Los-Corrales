@@ -31,4 +31,9 @@ export class AuthService {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
   }
+
+  register(userData: any) {
+    // Aqui usamos o mesmo padrão do login, mas apontamos para a rota de registo
+    return this.http.post<any>(`https://los-corrales-api.onrender.com/api/users/register`, userData);
+  }
 }

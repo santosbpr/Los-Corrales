@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SettingsService } from '../../services/settings.service';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-profile',
@@ -17,9 +18,17 @@ export class ProfileComponent implements OnInit {
   newColorName: string = '';
   newSizeName: string = '';
   newCategoryName: string = '';
+  newUser = {
+    email: '',
+    password: '',
+    role: 'CAIXA' // Por defeito, criamos operadores de caixa
+  };
+  
   constructor(
     private settingsService: SettingsService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private cdr: ChangeDetectorRef,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -27,33 +36,41 @@ export class ProfileComponent implements OnInit {
   }
 
   loadAllSettings() {
-    // Carrega as cores do banco
+   
     this.settingsService.getColors().subscribe({
-      next: (data) => this.colors = data,
+      next: (data) => { 
+        this.colors = data; 
+        this.cdr.detectChanges(); 
+      },
       error: () => this.notification.error('Erro ao carregar lista de cores.')
     });
 
-    // Carrega os tamanhos do banco
+    
     this.settingsService.getSizes().subscribe({
-      next: (data) => this.sizes = data,
+      next: (data) => { 
+        this.sizes = data; 
+        this.cdr.detectChanges(); 
+      },
       error: () => this.notification.error('Erro ao carregar lista de tamanhos.')
     });
 
-    // Carrega as categorias do banco
+   
     this.settingsService.getCategories().subscribe({
-      next: (data) => this.categories = data,
+      next: (data) => { 
+        this.categories = data; 
+        this.cdr.detectChanges(); 
+      },
       error: () => this.notification.error('Erro ao carregar categorias.')
     });
   }
 
   salvarCor() {
     if (!this.newColorName.trim()) return;
-    
     this.settingsService.addColor(this.newColorName.trim()).subscribe({
       next: () => {
         this.notification.success('Nova cor adicionada com sucesso!');
         this.newColorName = '';
-        this.loadAllSettings(); // Recarrega a lista
+        this.loadAllSettings(); 
       },
       error: () => this.notification.error('Erro ao salvar cor.')
     });
@@ -75,7 +92,6 @@ export class ProfileComponent implements OnInit {
 
   salvarTamanho() {
     if (!this.newSizeName.trim()) return;
-
     this.settingsService.addSize(this.newSizeName.trim()).subscribe({
       next: () => {
         this.notification.success('Novo tamanho adicionado!');
@@ -122,6 +138,28 @@ export class ProfileComponent implements OnInit {
           },
           error: () => this.notification.error('Erro ao excluir a categoria.')
         });
+      }
+    });
+  }
+
+  salvarUtilizador() {
+    if (!this.newUser.email || !this.newUser.password) {
+      this.notification.error('Preencha o e-mail e a palavra-passe!');
+      return;
+    }
+
+    this.authService.register(this.newUser).subscribe({
+      next: () => {
+        this.notification.success(`Utilizador ${this.newUser.role} criado com sucesso!`);
+        this.newUser = { email: '', password: '', role: 'CAIXA' };
+      },
+      error: (err) => {
+        // AQUI ESTÁ O SEGREDO: Vamos ver no console o erro real do servidor
+        console.error('Detalhes do erro do servidor:', err);
+        
+        // Exibe a mensagem que vem do Back-end
+        const mensagemErro = err.error?.message || 'Erro desconhecido ao criar utilizador.';
+        this.notification.error(mensagemErro);
       }
     });
   }
