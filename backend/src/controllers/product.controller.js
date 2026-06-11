@@ -25,7 +25,7 @@ const ProductController = {
   },
 
   // DELETAR
-  async deleteProduct(req, res) {
+  async delete(req, res) {
   try {
     const { id } = req.params;
     const operatorEmail = req.currentUserEmail; // Capturado pelo middleware de autorização

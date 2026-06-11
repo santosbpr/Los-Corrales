@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const ProductController = require('../controllers/product.controller');
+const authorize = require('../middlewares/auth.middleware');
 
 // LISTAR 
 router.get('/', ProductController.getAll);
@@ -12,7 +13,7 @@ router.post('/', ProductController.create);
 router.put('/:id', ProductController.update);
 
 // DELETAR
-router.delete('/:id', ProductController.delete);
+router.delete('/:id', authorize(['ADMIN']), ProductController.delete);
 
 // REGISTRAR VENDA
 router.post('/:id/sale', ProductController.registerSale);
