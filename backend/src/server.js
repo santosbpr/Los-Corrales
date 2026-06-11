@@ -7,6 +7,7 @@ const settingsRoutes = require('./routes/settings.route');
 const customerRoutes = require('./routes/customers.routes');
 const financeRoutes = require('./routes/finance.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const hardwareRoutes = require('./routes/hardware.routes');
 
 // 1. Inicializa o aplicativo Express (O "app" nasce aqui!)
 const app = express();
@@ -15,10 +16,15 @@ const app = express();
 app.use(cors()); 
 app.use(express.json()); 
 
-// 3. Importação e uso das rotas (Agora sim, o app já existe para ser usado!)
+// 3. Importação e uso das rotas
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/hardware', hardwareRoutes);
+app.use('/api/finance', financeRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/settings', settingsRoutes);
+
 // 4. Rota de teste (Health Check)
 app.get('/', (req, res) => {
     res.json({ 
@@ -32,15 +38,5 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
-
-// 6. Rota de Finanças (Finance) - Importante: Deve ser a última para evitar conflitos
-app.use('/api/finance', financeRoutes);
-
-// 7. Rota de Clientes (Customer) - Importante: Deve ser a última para evitar conflitos
-app.use('/api/customers', customerRoutes);
-
-// 8. Rota de Configurações (Settings) - Importante: Deve ser a última para evitar conflitos
-app.use('/api/settings', settingsRoutes);
-
 
 module.exports = app;
