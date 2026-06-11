@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const AuditService = require('../services/audit.service');
 
 const ProductController = {
   // LISTAR TUDO
@@ -24,11 +25,29 @@ const ProductController = {
   },
 
   // DELETAR
-  async delete(req, res) {
+  async deleteProduct(req, res) {
+  try {
     const { id } = req.params;
+    const operatorEmail = req.currentUserEmail; // Capturado pelo middleware de autorização
+
+    // Busca o nome do produto antes de deletar para colocar no histórico
+    const { data: product } = await supabase.from('products').select('name').eq('id', id).single();
+
     const { error } = await supabase.from('products').delete().eq('id', id);
-    if (error) return res.status(500).json(error);
-    return res.status(200).json({ message: 'Produto removido!' });
+    if (error) throw error;
+
+    // Registra a ação na tabela de auditoria
+    await AuditService.log(
+      operatorEmail, 
+      'EXCLUSÃO_PRODUTO', 
+      `O produto "${product?.name || 'ID: ' + id}" foi removido definitivamente do inventário.`
+    );
+
+    return res.status(200).json({ message: 'Produto removido com sucesso!' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Erro ao excluir o produto.' });
+  }
   },
 
   // REGISTRAR VENDA

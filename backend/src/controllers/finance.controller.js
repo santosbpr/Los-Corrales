@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const AuditService = require('../services/audit.service');
 
 const FinanceController = {
   // 1. Listar todas as transações (Extrato)
@@ -28,6 +29,13 @@ const FinanceController = {
         .select();
         
       if (error) throw error;
+      // Registra a ação na tabela de auditoria
+      await AuditService.log(
+        operatorEmail,
+        `FINANCEIRO_${type}`, // Cria a tag dinamicamente: FINANCEIRO_ENTRADA ou FINANCEIRO_SAÍDA
+        `Lançamento manual de R$ ${amount} registrado com a descrição: "${description}"`
+      );
+      
       return res.status(201).json({ message: 'Lançamento financeiro registrado!', transaction: data[0] });
     } catch (err) {
       console.error("Erro ao registrar finanças:", err);
