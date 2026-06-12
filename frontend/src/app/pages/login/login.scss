@@ -1,0 +1,163 @@
+.login-wrapper {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background-color: #000000; /* Fundo base preto */
+}
+
+/* --- LADO ESQUERDO (BANNER) --- */
+.login-left {
+  flex: 5.5; /* Ocupa cerca de 55% do ecrã */
+  background-color: #0A3319; /* Fundo escuro para mesclar com o banner */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-right: 1px solid #1f1f1f;
+  
+  .banner-img {
+    max-width: 75%; /* Garante que o logo respira e não cola nas bordas */
+    max-height: 85vh;
+    object-fit: contain; /* O segredo para não cortar a imagem! */
+  }
+}
+
+/* --- LADO DIREITO (FORMULÁRIO) --- */
+.login-right {
+  flex: 4.5; /* Ocupa 45% do ecrã */
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  box-shadow: -15px 0px 30px rgba(0, 0, 0, 0.4); /* Sombra elegante */
+  z-index: 2;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 380px;
+
+  .title {
+    font-size: 2.2rem;
+    color: #1a1a1a;
+    margin: 0 0 5px 0;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .subtitle {
+    color: #666;
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 1rem;
+  }
+
+  .input-group {
+    margin-bottom: 22px;
+
+    label {
+      display: block;
+      font-size: 0.75rem;
+      color: #4a4a4a;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+
+      label {
+        margin-bottom: 0;
+      }
+
+      .forgot-password {
+        font-size: 0.8rem;
+        color: #8B4513; /* O seu castanho rústico */
+        text-decoration: none;
+        font-weight: 600;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #333;
+      transition: all 0.2s ease;
+      box-sizing: border-box;
+
+      &:focus {
+        outline: none;
+        border-color: #8B4513;
+        box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
+      }
+
+      &.is-invalid {
+        border-color: #dc3545;
+      }
+    }
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 16px;
+    background-color: #8B4513; 
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    margin-top: 10px;
+
+    &:hover:not(:disabled) {
+      background-color: #6b340e; /* Castanho mais escuro no hover */
+    }
+
+    &:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  }
+
+  .footer-text {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 0.8rem;
+    color: #9ca3af;
+  }
+}
+
+/* --- RESPONSIVIDADE (TELEMÓVEIS) --- */
+@media (max-width: 900px) {
+  .login-wrapper {
+    flex-direction: column;
+  }
+
+  .login-left {
+    display: none; /* Esconde a imagem em ecrãs pequenos! */
+  }
+
+  .login-right {
+    flex: 1;
+    box-shadow: none;
+    justify-content: flex-start;
+    padding-top: 10vh; /* Dá um espaço no topo do telemóvel */
+  }
+}

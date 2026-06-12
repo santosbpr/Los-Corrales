@@ -1,41 +1,43 @@
-<div style="display: flex; min-height: 100vh; width: 100vw; margin: 0; padding: 0;">
-
-  <div style="flex: 6; background-image: url('https://images.unsplash.com/photo-1595349479366-419bba51bf87?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; position: relative;">
-    
-    <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.3);"></div>
+<div class="login-wrapper">
+  
+  <div class="login-left">
+    <img src="/assets/images/login-banner.png" alt="Original Clothing Banner" class="banner-img">
   </div>
 
-  <div style="flex: 4; display: flex; flex-direction: column; justify-content: center; align-items: center; background-color: #ffffff; padding: 40px; box-shadow: -10px 0px 20px rgba(0,0,0,0.05); z-index: 2;">
-    
-    <div style="width: 100%; max-width: 350px;">
+  <div class="login-right">
+    <div class="form-container">
       
-      <h1 style="margin: 0 0 5px 0; color: #1a1a1a; text-align: center; font-size: 32px;">Los Corrales</h1>
-      <p style="color: #666; margin-bottom: 40px; text-align: center;">Acesso ao Sistema ERP</p>
+      <h1 class="title">Los Corrales</h1>
+      <p class="subtitle">Acesso ao Sistema ERP</p>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" style="display: flex; flex-direction: column; gap: 20px;">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         
-        <div>
-          <label style="font-size: 13px; color: #4a4a4a; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">E-mail Corporativo</label>
-          <input type="email" formControlName="email" placeholder="gerente@loscorrales.com" 
-                 style="width: 100%; padding: 14px; margin-top: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 15px; transition: border-color 0.3s;">
+        <div class="input-group">
+          <label>E-MAIL CORPORATIVO</label>
+          <input type="email" formControlName="email" placeholder="nome@loscorrales.com"
+                 [ngClass]="{'is-invalid': loginForm.get('email')?.touched && loginForm.get('email')?.invalid}">
         </div>
 
-        <div>
-          <div style="display: flex; justify-content: space-between;">
-            <label style="font-size: 13px; color: #4a4a4a; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Senha</label>
-            <a href="#" style="font-size: 13px; color: #8B4513; text-decoration: none;">Esqueci a senha</a>
+        <div class="input-group">
+          <div class="label-row">
+            <label>SENHA</label>
+            <a href="#" class="forgot-password">Esqueci a senha</a>
           </div>
-          <input type="password" formControlName="password" placeholder="••••••••" 
-                 style="width: 100%; padding: 14px; margin-top: 8px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; outline: none; font-size: 15px; transition: border-color 0.3s;">
+          <input type="password" formControlName="password" placeholder="••••••••"
+                 [ngClass]="{'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}">
         </div>
 
-        <button type="submit" [disabled]="loginForm.invalid || isLoading" 
-                style="margin-top: 15px; padding: 16px; background: #1a1a1a; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.3s;"
-                [ngStyle]="{'opacity': isLoading ? '0.7' : '1'}">
-          {{ isLoading ? 'Carregando...' : 'Entrar' }}
+        <button type="submit" class="btn-submit" [disabled]="loginForm.invalid || isLoading">
+          <span *ngIf="!isLoading">Entrar na Plataforma</span>
+          <span *ngIf="isLoading" class="loader">Processando...</span>
         </button>
-
+        
       </form>
+
+      <div class="footer-text">
+        © Los Corrales Original Clothing 1980. <br>Todos os direitos reservados.
+      </div>
+      
     </div>
   </div>
 
