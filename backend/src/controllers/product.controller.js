@@ -9,11 +9,46 @@ const ProductController = {
     return res.status(200).json(data);
   },
 
-  // CRIAR NOVO
+  // ==========================================
+  // CRIAR NOVO (AGORA COM GERAÇÃO AUTOMÁTICA DE SKU)
+  // ==========================================
   async create(req, res) {
-    const { data, error } = await supabase.from('products').insert([req.body]).select();
-    if (error) return res.status(500).json(error);
-    return res.status(201).json(data[0]);
+    try {
+      const { name, category } = req.body;
+
+      // LÓGICA DE VARIANTES: Procura o tamanho e estoque dentro do array de variantes (se existir)
+      const size = req.body.variants && req.body.variants.length > 0 ? req.body.variants[0].size : req.body.size;
+      const stock = req.body.variants && req.body.variants.length > 0 ? req.body.variants[0].stock : req.body.quantity;
+
+      const prefix = category ? category.substring(0, 3).toUpperCase() : 'PRD';
+
+      const { count, error: countError } = await supabase
+          .from('products')
+          .select('*', { count: 'exact', head: true });
+
+      if (countError) throw countError;
+
+      const sequential = String((count || 0) + 1).padStart(4, '0');
+
+      const sizeSuffix = size ? `-${size.toUpperCase()}` : '';
+      const generatedSku = `${prefix}-${sequential}${sizeSuffix}`;
+
+      const { data, error } = await supabase
+          .from('products')
+          .insert([{ 
+            ...req.body, 
+            sku: generatedSku 
+          }])
+          .select();
+
+      if (error) throw error;
+
+      return res.status(201).json(data[0]);
+
+    } catch (err) {
+      console.error("Erro ao criar produto:", err);
+      return res.status(500).json({ message: "Erro ao gerar SKU e salvar o produto.", error: err });
+    }
   },
 
   // ATUALIZAR
@@ -26,28 +61,28 @@ const ProductController = {
 
   // DELETAR
   async delete(req, res) {
-  try {
-    const { id } = req.params;
-    const operatorEmail = req.currentUserEmail; // Capturado pelo middleware de autorização
+    try {
+      const { id } = req.params;
+      const operatorEmail = req.currentUserEmail; // Capturado pelo middleware de autorização
 
-    // Busca o nome do produto antes de deletar para colocar no histórico
-    const { data: product } = await supabase.from('products').select('name').eq('id', id).single();
+      // Busca o nome do produto antes de deletar para colocar no histórico
+      const { data: product } = await supabase.from('products').select('name').eq('id', id).single();
 
-    const { error } = await supabase.from('products').delete().eq('id', id);
-    if (error) throw error;
+      const { error } = await supabase.from('products').delete().eq('id', id);
+      if (error) throw error;
 
-    // Registra a ação na tabela de auditoria
-    await AuditService.log(
-      operatorEmail, 
-      'EXCLUSÃO_PRODUTO', 
-      `O produto "${product?.name || 'ID: ' + id}" foi removido definitivamente do inventário.`
-    );
+      // Registra a ação na tabela de auditoria
+      await AuditService.log(
+        operatorEmail, 
+        'EXCLUSÃO_PRODUTO', 
+        `O produto "${product?.name || 'ID: ' + id}" foi removido definitivamente do inventário.`
+      );
 
-    return res.status(200).json({ message: 'Produto removido com sucesso!' });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ message: 'Erro ao excluir o produto.' });
-  }
+      return res.status(200).json({ message: 'Produto removido com sucesso!' });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: 'Erro ao excluir o produto.' });
+    }
   },
 
   // REGISTRAR VENDA
@@ -55,6 +90,7 @@ const ProductController = {
     const { id } = req.params;
     const variantIndex = req.body.variantIndex || 0; 
     const quantity = req.body.quantity || 1;
+    const customerId = req.body.customer_id || null; // Corrigido a declaração que faltava aqui
 
     try {
       // 1. Buscamos o produto atual
@@ -83,7 +119,7 @@ const ProductController = {
       if (updateError) return res.status(500).json({ message: 'Erro ao atualizar o estoque.' });
 
       // ==========================================
-      // 4. NOVO: REGISTRAR NO HISTÓRICO DE VENDAS
+      // 4. REGISTRAR NO HISTÓRICO DE VENDAS
       // ==========================================
       const variantDetails = `Cor: ${updatedVariants[variantIndex].color} | Tam: ${updatedVariants[variantIndex].size}`;
       
@@ -94,7 +130,7 @@ const ProductController = {
           product_name: product.name,
           variant_info: variantDetails,
           quantity: quantity,
-          customer_id: customerId
+          customer_id: customerId // Agora a variável existe
         }]);
 
       if (saleError) console.error("Aviso: Venda feita, mas erro ao salvar histórico:", saleError);
@@ -120,6 +156,7 @@ const ProductController = {
       return res.status(200).json({ message: 'Venda registrada com sucesso e gravada no histórico!' });
 
     } catch (err) {
+      console.error(err);
       return res.status(500).json({ message: 'Erro interno no servidor.' });
     }
   }
