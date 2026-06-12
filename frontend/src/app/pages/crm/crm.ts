@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CustomerService } from '../../services/customer.service';
@@ -12,6 +12,7 @@ import { NotificationService } from '../../services/notification.service';
 })
 export class CrmComponent implements OnInit {
   customers: any[] = [];
+  searchTerm: string = '';
   
   // Objeto para segurar os dados do formulário
   newCustomer = {
@@ -23,7 +24,8 @@ export class CrmComponent implements OnInit {
 
   constructor(
     private customerService: CustomerService,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -32,15 +34,18 @@ export class CrmComponent implements OnInit {
 
   loadCustomers() {
     this.customerService.getCustomers().subscribe({
-      next: (data) => this.customers = data,
+      next: (data: any) => { 
+        this.customers = data;
+        this.cdr.detectChanges();
+     },
       error: () => this.notification.error('Erro ao carregar a lista de clientes.')
     });
   }
 
   salvarCliente() {
     // Validação básica
-    if (!this.newCustomer.name || !this.newCustomer.phone) {
-      this.notification.error('O Nome e o Telefone são obrigatórios!');
+    if (!this.newCustomer.name || !this.newCustomer.email) {
+      this.notification.error('O Nome e o Email são obrigatórios!');
       return;
     }
 
@@ -57,16 +62,15 @@ export class CrmComponent implements OnInit {
   }
 
   excluirCliente(id: number, name: string) {
-    this.notification.confirmDelete(name).then((result) => {
-      if (result.isConfirmed) {
-        this.customerService.deleteCustomer(id).subscribe({
-          next: () => {
-            this.notification.success('Cliente removido da base!');
-            this.loadCustomers();
-          },
-          error: () => this.notification.error('Erro ao tentar excluir o cliente.')
-        });
-      }
-    });
+    // Tratamento seguro para a confirmação de exclusão
+    if (confirm(`Tem certeza que deseja remover o cliente ${name}?`)) {
+      this.customerService.deleteCustomer(id).subscribe({
+        next: () => {
+          this.notification.success('Cliente removido com sucesso!');
+          this.loadCustomers(); // Atualiza a tabela
+        },
+        error: () => this.notification.error('Não foi possível excluir o cliente.')
+      });
+    }
   }
 }
