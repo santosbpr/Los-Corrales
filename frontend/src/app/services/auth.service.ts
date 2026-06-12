@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/operators';
+import { tap, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -32,8 +32,7 @@ export class AuthService {
     localStorage.removeItem('user');
   }
 
-  register(userData: any) {
-    // Aqui usamos o mesmo padrão do login, mas apontamos para a rota de registo
-    return this.http.post<any>(`https://los-corrales-api.onrender.com/api/users/register`, userData);
+  register(userData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/register`, userData);
   }
 }
