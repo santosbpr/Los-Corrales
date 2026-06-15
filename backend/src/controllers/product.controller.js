@@ -9,30 +9,40 @@ const ProductController = {
     return res.status(200).json(data);
   },
 
-  // ==========================================
-  // CRIAR NOVO (AGORA COM GERAÇÃO AUTOMÁTICA DE SKU)
-  // ==========================================
+
   async create(req, res) {
     try {
       const { name, category } = req.body;
 
-      // LÓGICA DE VARIANTES: Procura o tamanho e estoque dentro do array de variantes (se existir)
+      // Busca o tamanho e estoque (suporta tanto produtos simples quanto com variantes)
       const size = req.body.variants && req.body.variants.length > 0 ? req.body.variants[0].size : req.body.size;
       const stock = req.body.variants && req.body.variants.length > 0 ? req.body.variants[0].stock : req.body.quantity;
 
-      const prefix = category ? category.substring(0, 3).toUpperCase() : 'PRD';
+      // Segurança: Se a categoria não vier ou for inválida, usa 'PRD'
+      let prefix = 'PRD';
+      if (typeof category === 'string' && category.length >= 3) {
+        prefix = category.substring(0, 3).toUpperCase();
+      }
+      console.log("2. Prefixo gerado:", prefix);
 
+      // Conta os produtos no banco
       const { count, error: countError } = await supabase
           .from('products')
           .select('*', { count: 'exact', head: true });
 
-      if (countError) throw countError;
+      if (countError) {
+        console.error("ERRO AO CONTAR PRODUTOS:", countError);
+        throw countError;
+      }
 
+      // Monta o SKU
       const sequential = String((count || 0) + 1).padStart(4, '0');
-
-      const sizeSuffix = size ? `-${size.toUpperCase()}` : '';
+      const sizeSuffix = size ? `-${String(size).toUpperCase()}` : '';
       const generatedSku = `${prefix}-${sequential}${sizeSuffix}`;
+      
+      console.log("3. SKU Final Montado:", generatedSku);
 
+      // Salva no banco de dados
       const { data, error } = await supabase
           .from('products')
           .insert([{ 
@@ -41,13 +51,19 @@ const ProductController = {
           }])
           .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("4. ERRO DO SUPABASE NO INSERT:", error);
+        throw error;
+      }
+
+      console.log("5. PRODUTO SALVO COM SUCESSO! SKU gravado:", data[0].sku);
+      console.log("------------------------------------\n");
 
       return res.status(201).json(data[0]);
 
     } catch (err) {
-      console.error("Erro ao criar produto:", err);
-      return res.status(500).json({ message: "Erro ao gerar SKU e salvar o produto.", error: err });
+      console.error("Erro fatal ao criar produto:", err);
+      return res.status(500).json({ message: "Erro interno ao gerar SKU.", error: err });
     }
   },
 
