@@ -1,11 +1,12 @@
-/* You can add global styles to this file, and also import other style files */
-/* --- RESET GLOBAL: Remove as bordas padrão do navegador --- */
+/* --- RESET GLOBAL --- */
 html, body {
-  margin: 0;   /* Garante que o corpo não tem margem externa */
-  padding: 0;  /* Garante que o corpo não tem preenchimento interno */
-  width: 100%; /* Ocupa 100% da largura do navegador */
-  height: 100%; /* Ocupa 100% da altura do navegador */
+  margin: 0;   
+  padding: 0;  
+  width: 100%; 
+  min-height: 100vh; /* Permite que a página cresça */
   
-  /* Opcional: Garante que as scrollbars não aparecem desnecessariamente */
-  overflow: hidden; 
+  /* Esconde apenas a rolagem horizontal (que causava a borda branca) */
+  overflow-x: hidden; 
+  /* Garante que a rolagem vertical funciona no sistema todo */
+  overflow-y: auto; 
 }

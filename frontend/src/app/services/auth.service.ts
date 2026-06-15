@@ -1,32 +1,32 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap, Observable} from 'rxjs';
+import { tap, Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  // Ajuste a porta se o seu Node estiver rodando em uma diferente de 3000
-  private apiUrl = 'https://los-corrales-api.onrender.com/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
 
   constructor(private http: HttpClient) {}
 
   login(credentials: any) {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        // Se o login der certo, salvamos o Crachá (Token) no cofre do navegador
+        // Se o login der certo, salvamos o token e o usuário no navegador
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
       })
     );
   }
 
-  // Função para checar se o usuário tem o crachá guardado
+  // Checa se o usuário tem o token guardado
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }
 
-  // Função para sair do sistema
+  // Sai do sistema
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');

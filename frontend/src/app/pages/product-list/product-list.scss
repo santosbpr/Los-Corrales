@@ -230,3 +230,12 @@
     background-color: #e2e2e2;
   }
 }
+
+.table-wrapper {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+  
+  /* Permite rolar a tabela para os lados se a tela for pequena */
+  overflow-x: auto; 
+}

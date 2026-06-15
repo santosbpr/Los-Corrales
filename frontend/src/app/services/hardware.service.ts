@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class HardwareService {
-  private apiUrl = 'https://los-corrales-api.onrender.com/api/hardware';
+  private apiUrl = `${environment.apiUrl}/hardware`;
 
   constructor(private http: HttpClient) {}
 

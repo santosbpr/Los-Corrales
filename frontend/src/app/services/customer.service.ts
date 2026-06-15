@@ -1,22 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CustomerService {
-  // Altere para localhost se estiver a testar apenas na sua máquina
-  private apiUrl = 'https://los-corrales-api.onrender.com/api/customers'; 
+  private apiUrl = `${environment.apiUrl}/customers`;
 
   constructor(private http: HttpClient) {}
 
-  // Busca o "crachá" do utilizador que fez login
   private getAuthHeaders() {
     const userStr = localStorage.getItem('user');
     const user = userStr ? JSON.parse(userStr) : null;
-    return new HttpHeaders({ 
-      'user-email': user?.email || '' 
+    return new HttpHeaders({
+      'user-email': user?.email || ''
     });
   }
 

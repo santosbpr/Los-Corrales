@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProductService } from '../../services/product'; // Ajustado para o nome curto
+import { ProductService } from '../../services/product.service';
 import { ProductFormComponent } from '../product-form/product-form';
 import { FormsModule } from '@angular/forms';
 import { NotificationService } from '../../services/notification.service';

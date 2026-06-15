@@ -1,48 +1,55 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SettingsService {
-  // Ajuste a porta se o seu back-end rodar em outra (ex: 3000)
-  private apiUrl = 'https://los-corrales-api.onrender.com/api/settings'; 
+  private apiUrl = `${environment.apiUrl}/settings`;
 
   constructor(private http: HttpClient) {}
 
-  // Métodos para Cores
+  // Header de identificação enviado nas operações protegidas (escrita exige ADMIN no backend)
+  private getAuthHeaders() {
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    return new HttpHeaders({
+      'user-email': user?.email || ''
+    });
+  }
+
+  // Cores
   getColors(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/colors`);
   }
   addColor(name: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/colors`, { name });
+    return this.http.post<any>(`${this.apiUrl}/colors`, { name }, { headers: this.getAuthHeaders() });
   }
   deleteColor(id: number | string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/colors/${id}`);
+    return this.http.delete(`${this.apiUrl}/colors/${id}`, { headers: this.getAuthHeaders() });
   }
 
-
-  // Métodos para Tamanhos
+  // Tamanhos
   getSizes(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/sizes`);
   }
   addSize(name: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/sizes`, { name });
+    return this.http.post<any>(`${this.apiUrl}/sizes`, { name }, { headers: this.getAuthHeaders() });
   }
   deleteSize(id: number | string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/sizes/${id}`);
+    return this.http.delete(`${this.apiUrl}/sizes/${id}`, { headers: this.getAuthHeaders() });
   }
 
-  
-  // Métodos para Categorias
+  // Categorias
   getCategories(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/categories`);
   }
   addCategory(name: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/categories`, { name });
+    return this.http.post<any>(`${this.apiUrl}/categories`, { name }, { headers: this.getAuthHeaders() });
   }
   deleteCategory(id: number | string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/categories/${id}`);
+    return this.http.delete(`${this.apiUrl}/categories/${id}`, { headers: this.getAuthHeaders() });
   }
 }
