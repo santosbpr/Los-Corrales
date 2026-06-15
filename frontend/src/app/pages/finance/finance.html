@@ -37,8 +37,10 @@
       </div>
 
       <div>
-        <button (click)="registrarLancamento()" style="padding: 10px 20px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
-          Lançar
+        <button (click)="registrarLancamento()" [disabled]="isSaving"
+                style="padding: 10px 20px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;"
+                [style.opacity]="isSaving ? 0.6 : 1">
+          {{ isSaving ? 'Lançando...' : 'Lançar' }}
         </button>
       </div>
     </div>

@@ -8,6 +8,7 @@ const customerRoutes = require('./routes/customers.routes');
 const financeRoutes = require('./routes/finance.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
 const hardwareRoutes = require('./routes/hardware.routes');
+const userRoutes = require('./routes/users.routes');
 
 // 1. Inicializa o aplicativo Express
 const app = express();
@@ -29,6 +30,7 @@ app.use('/api/hardware', hardwareRoutes);
 app.use('/api/finance', financeRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/users', userRoutes);
 
 // 4. Health check
 app.get('/', (req, res) => {

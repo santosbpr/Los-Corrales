@@ -45,9 +45,10 @@
 
   </div>
 
-  <button type="submit" [disabled]="productForm.invalid"
-          style="margin-top: 15px; padding: 12px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer;">
-    Salvar Produto
+  <button type="submit" [disabled]="productForm.invalid || isSaving"
+          style="margin-top: 15px; padding: 12px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer;"
+          [style.opacity]="isSaving ? 0.6 : 1">
+    {{ isSaving ? 'Salvando...' : 'Salvar Produto' }}
   </button>
   
 </form>

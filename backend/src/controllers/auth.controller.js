@@ -3,23 +3,34 @@ const supabase = require('../config/supabase');
 const AuthController = {
     async login(req, res) {
         const { email, password } = req.body;
-    
-        //Login com a senha passa pelo Supabase
+
+        // Autenticação via Supabase
         const { data, error } = await supabase.auth.signInWithPassword({
             email: email,
             password: password,
         });
 
-        if (error) { //Mensagem de erro caso as credenciais estejam erradas
+        if (error) {
             return res.status(401).json({ error: 'E-mail ou senha inválidas' });
         }
+
+        // Busca o papel (role) na tabela profiles para devolver ao frontend.
+        // Default seguro: CAIXA, caso o perfil ainda não tenha role definido.
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('email', data.user.email)
+            .single();
+
+        const role = String(profile?.role || 'CAIXA').toUpperCase();
 
         return res.status(200).json({
             message: 'Login bem-sucedido',
             token: data.session.access_token,
-            user:{
+            user: {
                 id: data.user.id,
-                email: data.user.email
+                email: data.user.email,
+                role: role
             }
         });
     },
@@ -27,12 +38,11 @@ const AuthController = {
     async register(req, res) {
         const { email, password, role } = req.body;
 
-        // Registo no Supabase
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
             options: {
-                data: { role: role || 'CAIXA' } // Guarda o cargo no perfil do utilizador
+                data: { role: role || 'CAIXA' } // o gatilho do banco copia isto para profiles
             }
         });
 

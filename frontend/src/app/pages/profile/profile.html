@@ -108,12 +108,47 @@
           </select>
         </div>
 
-        <button (click)="salvarUtilizador()" style="margin-top: 10px; padding: 12px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
-          Registar Utilizador
+        <button (click)="salvarUtilizador()" [disabled]="isCreatingUser"
+                style="margin-top: 10px; padding: 12px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;"
+                [style.opacity]="isCreatingUser ? 0.6 : 1">
+          {{ isCreatingUser ? 'Registando...' : 'Registar Utilizador' }}
         </button>
 
       </div>
     </div>
+
+    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
+      <h3 style="margin-top: 0; color: #333; font-size: 16px;">🔑 Usuários do Sistema</h3>
+      <p style="color: #666; font-size: 12px; margin-bottom: 15px;">Redefina a senha de qualquer funcionário (Administrador ou Caixa).</p>
+
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr style="background: #f1f1f1; text-align: left;">
+          <th style="padding: 10px; border-bottom: 2px solid #ddd;">E-mail</th>
+          <th style="padding: 10px; border-bottom: 2px solid #ddd;">Cargo</th>
+          <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right;">Ações</th>
+        </tr>
+        <tr *ngFor="let u of users" style="border-bottom: 1px solid #eee;">
+          <td style="padding: 10px; color: #555;">{{ u.email }}</td>
+          <td style="padding: 10px;">
+            <span [style.background]="u.role === 'ADMIN' ? '#000' : '#6c757d'"
+                  style="color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">
+              {{ u.role }}
+            </span>
+          </td>
+          <td style="padding: 10px; text-align: right;">
+            <button (click)="resetarSenha(u)" [disabled]="resettingEmail === u.email"
+                    style="padding: 6px 12px; background: #d33; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer;"
+                    [style.opacity]="resettingEmail === u.email ? 0.6 : 1">
+              {{ resettingEmail === u.email ? 'Resetando...' : 'Resetar senha' }}
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="users.length === 0">
+          <td colspan="3" style="padding: 15px; text-align: center; color: #999;">Nenhum usuário carregado.</td>
+        </tr>
+      </table>
+    </div>
+
 
   </div>
 </div>

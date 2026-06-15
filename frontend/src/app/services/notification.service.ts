@@ -6,7 +6,6 @@ import Swal from 'sweetalert2';
 })
 export class NotificationService {
 
-  // Notificação que aparece no canto da tela e some sozinha
   private toast = Swal.mixin({
     toast: true,
     position: 'top-end',
@@ -15,23 +14,14 @@ export class NotificationService {
     timerProgressBar: true,
   });
 
-  // Notificação de Sucesso (Verdinha) no canto da tela
   success(message: string) {
-    this.toast.fire({
-      icon: 'success',
-      title: message
-    });
+    this.toast.fire({ icon: 'success', title: message });
   }
 
-  // Notificação de Erro (Vermelha) no canto da tela
   error(message: string) {
-    this.toast.fire({
-      icon: 'error',
-      title: message
-    });
+    this.toast.fire({ icon: 'error', title: message });
   }
 
-  // Pop-up central para confirmar uma exclusão (Avisa antes de apagar)
   confirmDelete(itemName: string): Promise<any> {
     return Swal.fire({
       title: 'Tem certeza?',
@@ -43,5 +33,23 @@ export class NotificationService {
       confirmButtonText: 'Sim, excluir!',
       cancelButtonText: 'Cancelar'
     });
+  }
+
+  // Pede ao admin a nova senha do usuário. Resolve com a senha digitada, ou null se cancelado.
+  promptPasswordReset(email: string): Promise<string | null> {
+    return Swal.fire({
+      title: 'Resetar senha',
+      text: `Defina uma nova senha para ${email}`,
+      input: 'password',
+      inputPlaceholder: 'Nova senha (mín. 6 caracteres)',
+      inputAttributes: { autocomplete: 'new-password' },
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Resetar senha',
+      cancelButtonText: 'Cancelar',
+      inputValidator: (value) =>
+        (!value || value.length < 6) ? 'A senha precisa de pelo menos 6 caracteres.' : undefined
+    }).then(result => (result.isConfirmed ? (result.value as string) : null));
   }
 }

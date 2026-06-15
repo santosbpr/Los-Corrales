@@ -50,9 +50,10 @@
                  style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ccc; border-radius: 6px; outline: none; font-size: 15px;">
         </div>
 
-        <button (click)="finalizarVenda()" [disabled]="!selectedProduct"
-                style="width: 100%; padding: 15px; background: #000; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s; margin-top: 10px;">
-          Confirmar Saída Manual
+        <button (click)="finalizarVenda()" [disabled]="!selectedProduct || isProcessing"
+                style="width: 100%; padding: 15px; background: #000; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s; margin-top: 10px;"
+                [style.opacity]="(!selectedProduct || isProcessing) ? 0.6 : 1">
+          {{ isProcessing ? 'Processando...' : 'Confirmar Saída Manual' }}
         </button>
 
       </div>

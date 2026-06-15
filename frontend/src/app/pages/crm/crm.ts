@@ -1,6 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { CustomerService } from '../../services/customer.service';
 import { NotificationService } from '../../services/notification.service';
 
@@ -13,14 +14,9 @@ import { NotificationService } from '../../services/notification.service';
 export class CrmComponent implements OnInit {
   customers: any[] = [];
   searchTerm: string = '';
-  
-  // Objeto para segurar os dados do formulário
-  newCustomer = {
-    name: '',
-    cpf: '',
-    phone: '',
-    email: ''
-  };
+  isSaving = false; // trava o botão durante o cadastro
+
+  newCustomer = { name: '', cpf: '', phone: '', email: '' };
 
   constructor(
     private customerService: CustomerService,
@@ -34,40 +30,40 @@ export class CrmComponent implements OnInit {
 
   loadCustomers() {
     this.customerService.getCustomers().subscribe({
-      next: (data: any) => { 
+      next: (data: any) => {
         this.customers = data;
         this.cdr.detectChanges();
-     },
+      },
       error: () => this.notification.error('Erro ao carregar a lista de clientes.')
     });
   }
 
   salvarCliente() {
-    // Validação básica
+    if (this.isSaving) return; // evita duplo-clique
     if (!this.newCustomer.name || !this.newCustomer.email) {
       this.notification.error('O Nome e o Email são obrigatórios!');
       return;
     }
 
-    this.customerService.addCustomer(this.newCustomer).subscribe({
-      next: () => {
-        this.notification.success('Cliente cadastrado com sucesso!');
-        // Limpa o formulário
-        this.newCustomer = { name: '', cpf: '', phone: '', email: '' };
-        // Recarrega a tabela
-        this.loadCustomers();
-      },
-      error: () => this.notification.error('Erro ao salvar os dados do cliente.')
-    });
+    this.isSaving = true;
+    this.customerService.addCustomer(this.newCustomer)
+      .pipe(finalize(() => this.isSaving = false))
+      .subscribe({
+        next: () => {
+          this.notification.success('Cliente cadastrado com sucesso!');
+          this.newCustomer = { name: '', cpf: '', phone: '', email: '' };
+          this.loadCustomers();
+        },
+        error: () => this.notification.error('Erro ao salvar os dados do cliente.')
+      });
   }
 
   excluirCliente(id: number, name: string) {
-    // Tratamento seguro para a confirmação de exclusão
     if (confirm(`Tem certeza que deseja remover o cliente ${name}?`)) {
       this.customerService.deleteCustomer(id).subscribe({
         next: () => {
           this.notification.success('Cliente removido com sucesso!');
-          this.loadCustomers(); // Atualiza a tabela
+          this.loadCustomers();
         },
         error: () => this.notification.error('Não foi possível excluir o cliente.')
       });

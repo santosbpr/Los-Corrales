@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import { NotificationService } from '../../services/notification.service';
 import { SettingsService } from '../../services/settings.service';
@@ -18,10 +19,9 @@ export class ProductFormComponent implements OnInit {
 
   availableColors: any[] = [];
   availableCategories: any[] = [];
-  
-  // Novas variáveis para a magia do filtro
   allSizes: any[] = [];
-  filteredSizes: any[] = []; 
+  filteredSizes: any[] = [];
+  isSaving = false; // trava o botão durante o salvamento
 
   @Input() set product(val: any) {
     if (val) {
@@ -48,7 +48,7 @@ export class ProductFormComponent implements OnInit {
   });
 
   constructor(
-    private productService: ProductService, 
+    private productService: ProductService,
     private notificationService: NotificationService,
     private settingsService: SettingsService
   ) {}
@@ -64,16 +64,14 @@ export class ProductFormComponent implements OnInit {
       error: () => this.notificationService.error('Erro ao carregar categorias oficiais.')
     });
 
-    // Carrega todos os tamanhos e inicializa a lista filtrada
     this.settingsService.getSizes().subscribe({
       next: (data) => {
         this.allSizes = data;
-        this.filteredSizes = data; 
+        this.filteredSizes = data;
       },
       error: () => this.notificationService.error('Erro ao carregar grade de tamanhos.')
     });
 
-    // O "Espião": Observa sempre que o campo Categoria for alterado!
     this.productForm.get('category')?.valueChanges.subscribe(categoriaSelecionada => {
       this.filtrarTamanhosPorCategoria(categoriaSelecionada);
     });
@@ -86,61 +84,52 @@ export class ProductFormComponent implements OnInit {
     }
 
     const catTexto = categoria.toLowerCase();
-    
-    // Regras de negócio inteligentes baseadas em palavras-chave
     const usarNumeros = ['calça', 'calca', 'bermuda', 'short'].some(palavra => catTexto.includes(palavra));
     const usarLetras = ['camisa', 'camiseta', 'jaqueta', 'casaco', 'moletom'].some(palavra => catTexto.includes(palavra));
 
     this.filteredSizes = this.allSizes.filter(size => {
-      // Tenta converter o nome do tamanho para um número
-      const isNumero = !isNaN(Number(size.name)); 
-      
+      const isNumero = !isNaN(Number(size.name));
       if (usarNumeros) return isNumero;
       if (usarLetras) return !isNumero;
-      return true; // Se for uma categoria diferente, mostra todos
+      return true;
     });
 
-    // Limpa o campo de tamanho sempre que a categoria mudar para evitar enviar um tamanho errado
     this.productForm.patchValue({ size: '' });
   }
 
   onSubmit() {
-    if (this.productForm.valid) {
-      const formValues = this.productForm.value;
-
-      const newProduct = {
-        name: formValues.name,
-        category: formValues.category,
-        description: "Produto cadastrado via sistema",
-        variants: [
-          {
-            sku: "SKU-" + Math.floor(Math.random() * 10000),
-            color: formValues.color,
-            size: formValues.size,
-            stock: formValues.stock
-          }
-        ]
-      };
-
-      if (this.currentProductId) {
-        this.productService.updateProduct(this.currentProductId, newProduct).subscribe({
-          next: () => {
-            this.notificationService.success('Produto atualizado!');
-            this.productSaved.emit();
-          },
-          error: () => this.notificationService.error('Erro ao atualizar.')
-        });
-      } else {
-        this.productService.createProduct(newProduct).subscribe({
-          next: () => {
-            this.notificationService.success('Produto cadastrado com sucesso!');
-            this.productSaved.emit();
-          },
-          error: () => this.notificationService.error('Erro ao guardar produto.')
-        });
-      }
-    } else {
+    if (this.isSaving) return; // evita duplo-clique
+    if (!this.productForm.valid) {
       this.productForm.markAllAsTouched();
+      return;
     }
+
+    const formValues = this.productForm.value;
+    const newProduct = {
+      name: formValues.name,
+      category: formValues.category,
+      description: "Produto cadastrado via sistema",
+      variants: [
+        {
+          sku: "SKU-" + Math.floor(Math.random() * 10000),
+          color: formValues.color,
+          size: formValues.size,
+          stock: formValues.stock
+        }
+      ]
+    };
+
+    this.isSaving = true;
+    const request$ = this.currentProductId
+      ? this.productService.updateProduct(this.currentProductId, newProduct)
+      : this.productService.createProduct(newProduct);
+
+    request$.pipe(finalize(() => this.isSaving = false)).subscribe({
+      next: () => {
+        this.notificationService.success(this.currentProductId ? 'Produto atualizado!' : 'Produto cadastrado com sucesso!');
+        this.productSaved.emit();
+      },
+      error: () => this.notificationService.error('Erro ao guardar produto.')
+    });
   }
 }

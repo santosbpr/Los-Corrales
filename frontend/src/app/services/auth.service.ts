@@ -14,19 +14,25 @@ export class AuthService {
   login(credentials: any) {
     return this.http.post<any>(`${this.apiUrl}/login`, credentials).pipe(
       tap(response => {
-        // Se o login der certo, salvamos o token e o usuário no navegador
+        // Persiste token e usuário (com role) no navegador
         localStorage.setItem('token', response.token);
         localStorage.setItem('user', JSON.stringify(response.user));
       })
     );
   }
 
-  // Checa se o usuário tem o token guardado
+  // Token presente = sessão ativa
   isLoggedIn(): boolean {
     return !!localStorage.getItem('token');
   }
 
-  // Sai do sistema
+  // Papel do usuário logado (sempre em maiúsculas; vazio se não houver)
+  getRole(): string {
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    return String(user?.role || '').toUpperCase();
+  }
+
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('user');

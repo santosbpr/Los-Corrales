@@ -1,20 +1,14 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ProductService {
   private apiUrl = `${environment.apiUrl}/products`;
 
-  // Canal que avisa quando a lista de produtos precisa ser recarregada
   private _refreshNeeded$ = new Subject<void>();
-
-  get refreshNeeded$() {
-    return this._refreshNeeded$;
-  }
+  get refreshNeeded$() { return this._refreshNeeded$; }
 
   constructor(private http: HttpClient) { }
 
@@ -34,25 +28,12 @@ export class ProductService {
     );
   }
 
-  // Deleta um produto (rota protegida por ADMIN no backend)
+  // Credenciais (user-email + token) são injetadas pelo authInterceptor.
   deleteProduct(id: number | string) {
-    const userStr = localStorage.getItem('user');
-    const user = userStr ? JSON.parse(userStr) : null;
-    const token = localStorage.getItem('token');
-
-    // O backend identifica o usuário pelo header 'user-email' e consulta o role no banco.
-    let headers = new HttpHeaders({
-      'user-email': user?.email || ''
-    });
-
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-
-    return this.http.delete(`${this.apiUrl}/${id}`, { headers });
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  // Registra uma venda. ATENÇÃO: o backend expõe esta rota como '/:id/sale'.
+  // O backend expõe esta rota como '/:id/sale'.
   registerSale(id: number | string, saleData: { variantIndex: number, quantity: number }) {
     return this.http.post(`${this.apiUrl}/${id}/sale`, saleData);
   }

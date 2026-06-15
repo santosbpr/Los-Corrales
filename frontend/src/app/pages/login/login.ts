@@ -13,7 +13,7 @@ import { NotificationService } from '../../services/notification.service';
   styleUrl: './login.scss'
 })
 export class LoginComponent {
-  isLoading: boolean = false; 
+  isLoading: boolean = false;
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -27,28 +27,20 @@ export class LoginComponent {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      this.isLoading = true; 
+      this.isLoading = true;
 
       this.authService.login(this.loginForm.value).subscribe({
-        next: (response) => { 
+        next: (response) => {
           this.isLoading = false;
           this.notificationService.success('Bem-vindo ao Los Corrales!');
-          
-          // O Redirecionamento Inteligente com Chave Mestra:
-          let userRole = response.user.role ? response.user.role.toUpperCase() : 'CAIXA';
-          
-          if (response.user.email === 'admin@loscorrales.com') {
-            userRole = 'ADMIN';
-          }
 
-          if (userRole === 'ADMIN') {
-            this.router.navigate(['/dashboard']); 
-          } else {
-            this.router.navigate(['/pdv']); 
-          }
+          // O role vem do backend (lido de profiles). Default seguro: CAIXA.
+          const userRole = String(response.user?.role || 'CAIXA').toUpperCase();
+
+          this.router.navigate([userRole === 'ADMIN' ? '/dashboard' : '/pdv']);
         },
         error: (err) => {
-          this.isLoading = false; 
+          this.isLoading = false;
           this.notificationService.error(err.error?.message || 'Falha ao fazer login');
         }
       });
