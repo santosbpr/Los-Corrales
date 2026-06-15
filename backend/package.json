@@ -2,7 +2,7 @@
   "name": "los-corrales-erp_backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
     "start": "npx nodemon src/server.js"
   },
@@ -14,8 +14,7 @@
     "@supabase/supabase-js": "^2.104.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "pg": "^8.20.0"
+    "express": "^5.2.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

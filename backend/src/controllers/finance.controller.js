@@ -9,7 +9,7 @@ const FinanceController = {
         .from('financial_transactions')
         .select('*')
         .order('created_at', { ascending: false }); // Traz as mais recentes primeiro
-        
+
       if (error) throw error;
       return res.status(200).json(data || []);
     } catch (err) {
@@ -22,20 +22,25 @@ const FinanceController = {
   async addTransaction(req, res) {
     try {
       const { type, amount, description } = req.body;
-      
+
+      // FIX: operatorEmail não estava declarado (causava ReferenceError -> 500 em todo lançamento).
+      // Vem do middleware quando a rota é protegida; cai no header como fallback.
+      const operatorEmail = req.currentUserEmail || req.headers['user-email'] || 'SISTEMA';
+
       const { data, error } = await supabase
         .from('financial_transactions')
         .insert([{ type, amount, description }])
         .select();
-        
+
       if (error) throw error;
+
       // Registra a ação na tabela de auditoria
       await AuditService.log(
         operatorEmail,
-        `FINANCEIRO_${type}`, // Cria a tag dinamicamente: FINANCEIRO_ENTRADA ou FINANCEIRO_SAÍDA
+        `FINANCEIRO_${type}`, // FINANCEIRO_ENTRADA ou FINANCEIRO_SAÍDA
         `Lançamento manual de R$ ${amount} registrado com a descrição: "${description}"`
       );
-      
+
       return res.status(201).json({ message: 'Lançamento financeiro registrado!', transaction: data[0] });
     } catch (err) {
       console.error("Erro ao registrar finanças:", err);

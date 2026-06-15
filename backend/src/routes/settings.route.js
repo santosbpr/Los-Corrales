@@ -1,20 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const SettingsController = require('../controllers/settings.controller');
+const authorize = require('../middlewares/auth.middleware');
 
-// Rotas de Cores
+// Cores
 router.get('/colors', SettingsController.getColors);
-router.post('/colors', SettingsController.addColor);
-router.delete('/colors/:id', SettingsController.deleteColor);
+router.post('/colors', authorize(['ADMIN']), SettingsController.addColor);
+router.delete('/colors/:id', authorize(['ADMIN']), SettingsController.deleteColor);
 
-// Rotas de Tamanhos
+// Tamanhos
 router.get('/sizes', SettingsController.getSizes);
-router.post('/sizes', SettingsController.addSize);
-router.delete('/sizes/:id', SettingsController.deleteSize);
+router.post('/sizes', authorize(['ADMIN']), SettingsController.addSize);
+router.delete('/sizes/:id', authorize(['ADMIN']), SettingsController.deleteSize);
 
-// Rotas de Categorias
+// Categorias
 router.get('/categories', SettingsController.getCategories);
-router.post('/categories', SettingsController.addCategory);
-router.delete('/categories/:id', SettingsController.deleteCategory);
+router.post('/categories', authorize(['ADMIN']), SettingsController.addCategory);
+router.delete('/categories/:id', authorize(['ADMIN']), SettingsController.deleteCategory);
 
 module.exports = router;
