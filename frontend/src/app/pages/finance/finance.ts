@@ -8,7 +8,8 @@ import { FinanceService } from '../../services/finance.service';
   selector: 'app-finance',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './finance.html'
+  templateUrl: './finance.html',
+  styleUrl: './finance.scss'
 })
 export class FinanceComponent implements OnInit {
   transactions: any[] = [];

@@ -10,7 +10,8 @@ import { HardwareService } from '../../services/hardware.service';
   selector: 'app-pdv',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './pdv.html'
+  templateUrl: './pdv.html',
+  styleUrl: './pdv.scss'
 })
 export class PdvComponent implements OnInit {
   products: any[] = [];

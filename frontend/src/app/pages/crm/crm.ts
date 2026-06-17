@@ -9,7 +9,8 @@ import { NotificationService } from '../../services/notification.service';
   selector: 'app-crm',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './crm.html'
+  templateUrl: './crm.html',
+  styleUrl: './crm.scss'
 })
 export class CrmComponent implements OnInit {
   customers: any[] = [];

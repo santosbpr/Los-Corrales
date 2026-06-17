@@ -21,7 +21,7 @@ export class ProductFormComponent implements OnInit {
   availableCategories: any[] = [];
   allSizes: any[] = [];
   filteredSizes: any[] = [];
-  isSaving = false; // trava o botão durante o salvamento
+  isSaving = false;
 
   @Input() set product(val: any) {
     if (val) {
@@ -29,12 +29,14 @@ export class ProductFormComponent implements OnInit {
       this.productForm.patchValue({
         name: val.name,
         category: val.category,
+        price: val.price ?? null,
+        cost: val.cost ?? 0,
         color: val.variants && val.variants.length > 0 ? val.variants[0].color : '',
         size: val.variants && val.variants.length > 0 ? val.variants[0].size : '',
         stock: val.variants && val.variants.length > 0 ? val.variants[0].stock : 0
       });
     } else {
-      this.productForm.reset({ stock: 1 });
+      this.productForm.reset({ stock: 1, cost: 0 });
       this.currentProductId = null;
     }
   }
@@ -42,6 +44,8 @@ export class ProductFormComponent implements OnInit {
   productForm = new FormGroup({
     name: new FormControl('', Validators.required),
     category: new FormControl('', Validators.required),
+    price: new FormControl(null, [Validators.required, Validators.min(0)]),
+    cost: new FormControl(0, [Validators.min(0)]),
     color: new FormControl('', Validators.required),
     size: new FormControl('', Validators.required),
     stock: new FormControl(1, [Validators.required, Validators.min(0)])
@@ -98,7 +102,7 @@ export class ProductFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.isSaving) return; // evita duplo-clique
+    if (this.isSaving) return;
     if (!this.productForm.valid) {
       this.productForm.markAllAsTouched();
       return;
@@ -108,10 +112,12 @@ export class ProductFormComponent implements OnInit {
     const newProduct = {
       name: formValues.name,
       category: formValues.category,
-      description: "Produto cadastrado via sistema",
+      description: 'Produto cadastrado via sistema',
+      price: Number(formValues.price) || 0,
+      cost: Number(formValues.cost) || 0,
+      // Sem sku/id aqui — o backend gera o SKU determinístico e o id estável da variação.
       variants: [
         {
-          sku: "SKU-" + Math.floor(Math.random() * 10000),
           color: formValues.color,
           size: formValues.size,
           stock: formValues.stock

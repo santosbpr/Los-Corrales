@@ -11,7 +11,8 @@ import { UserService } from '../../services/user.service';
   selector: 'app-profile',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './profile.html'
+  templateUrl: './profile.html',
+  styleUrl: './profile.scss'
 })
 export class ProfileComponent implements OnInit {
   colors: any[] = [];
@@ -162,6 +163,25 @@ export class ProfileComponent implements OnInit {
           next: () => this.notification.success(`Senha de ${user.email} redefinida!`),
           error: (err) => this.notification.error(err.error?.message || 'Não foi possível resetar a senha.')
         });
+    });
+  }
+
+  // Excluir permanentemente um funcionário do sistema
+  excluirUtilizador(user: any) {
+    this.notification.confirmDelete(user.email).then((result) => {
+      if (result.isConfirmed) {
+        // Nota: Certifique-se de que o método no seu 'userService' se chama 'deleteUser'
+        this.userService.deleteUser(user.id).subscribe({
+          next: () => {
+            this.notification.success(`O acesso de ${user.email} foi removido com sucesso!`);
+            this.loadUsers(); // Recarrega a listagem de usuários na tela
+          },
+          error: (err) => {
+            console.error('Erro ao deletar usuário:', err);
+            this.notification.error(err.error?.message || 'Não foi possível excluir este usuário.');
+          }
+        });
+      }
     });
   }
 }

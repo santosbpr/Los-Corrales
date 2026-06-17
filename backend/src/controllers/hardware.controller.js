@@ -24,7 +24,7 @@ const HardwareController = {
       // 2. Varre os produtos e suas variantes para achar o código exato
       for (let p of products) {
         if (p.variants && Array.isArray(p.variants)) {
-          const vIndex = p.variants.findIndex(v => v.sku === tag_id);
+          const vIndex = p.variants.findIndex(v => v.sku === tag_id || v.id === tag_id);
           if (vIndex !== -1) {
             targetProduct = p;
             targetVariantIndex = vIndex;

@@ -1,5 +1,30 @@
+const crypto = require('crypto');
 const supabase = require('../config/supabase');
 const AuditService = require('../services/audit.service');
+
+// SKU/barcode determinístico de uma variação: PRODUTO-COR-TAMANHO
+function makeVariantSku(productSku, v) {
+  const color = String(v.color || '').toUpperCase().replace(/\s+/g, '');
+  const size  = String(v.size  || '').toUpperCase().replace(/\s+/g, '');
+  return `${productSku || 'PRD'}-${color}-${size}`;
+}
+
+// Garante id estável e sku determinístico em cada variação.
+// Preserva o id das variações existentes (casando por id, ou por cor+tamanho).
+function normalizeVariants(productSku, incoming, existing = []) {
+  const arr = Array.isArray(incoming) ? incoming : [];
+  return arr.map(v => {
+    let id = v.id;
+    if (!id) {
+      const match = (existing || []).find(e =>
+        String(e.color).toUpperCase() === String(v.color).toUpperCase() &&
+        String(e.size).toUpperCase()  === String(v.size).toUpperCase()
+      );
+      id = match?.id || crypto.randomUUID();
+    }
+    return { ...v, id, sku: makeVariantSku(productSku, v) };
+  });
+}
 
 const ProductController = {
   // LISTAR TUDO
@@ -9,88 +34,90 @@ const ProductController = {
     return res.status(200).json(data);
   },
 
-
+  // CRIAR
   async create(req, res) {
     try {
       const { name, category } = req.body;
 
-      // Busca o tamanho e estoque (suporta tanto produtos simples quanto com variantes)
-      const size = req.body.variants && req.body.variants.length > 0 ? req.body.variants[0].size : req.body.size;
-      const stock = req.body.variants && req.body.variants.length > 0 ? req.body.variants[0].stock : req.body.quantity;
+      const size = req.body.variants && req.body.variants.length > 0
+        ? req.body.variants[0].size : req.body.size;
 
-      // Segurança: Se a categoria não vier ou for inválida, usa 'PRD'
+      // Prefixo do SKU do produto a partir da categoria
       let prefix = 'PRD';
       if (typeof category === 'string' && category.length >= 3) {
         prefix = category.substring(0, 3).toUpperCase();
       }
-      console.log("2. Prefixo gerado:", prefix);
 
-      // Conta os produtos no banco
+      // Sequencial baseado na contagem atual
       const { count, error: countError } = await supabase
-          .from('products')
-          .select('*', { count: 'exact', head: true });
+        .from('products')
+        .select('*', { count: 'exact', head: true });
+      if (countError) throw countError;
 
-      if (countError) {
-        console.error("ERRO AO CONTAR PRODUTOS:", countError);
-        throw countError;
-      }
-
-      // Monta o SKU
       const sequential = String((count || 0) + 1).padStart(4, '0');
       const sizeSuffix = size ? `-${String(size).toUpperCase()}` : '';
       const generatedSku = `${prefix}-${sequential}${sizeSuffix}`;
-      
-      console.log("3. SKU Final Montado:", generatedSku);
 
-      // Salva no banco de dados
+      // Normaliza as variações (id + sku determinístico) usando o SKU do produto
+      const variants = normalizeVariants(generatedSku, req.body.variants);
+
       const { data, error } = await supabase
-          .from('products')
-          .insert([{ 
-            ...req.body, 
-            sku: generatedSku 
-          }])
-          .select();
-
-      if (error) {
-        console.error("4. ERRO DO SUPABASE NO INSERT:", error);
-        throw error;
-      }
-
-      console.log("5. PRODUTO SALVO COM SUCESSO! SKU gravado:", data[0].sku);
-      console.log("------------------------------------\n");
+        .from('products')
+        .insert([{ ...req.body, sku: generatedSku, variants }])
+        .select();
+      if (error) throw error;
 
       return res.status(201).json(data[0]);
-
     } catch (err) {
-      console.error("Erro fatal ao criar produto:", err);
-      return res.status(500).json({ message: "Erro interno ao gerar SKU.", error: err });
+      console.error('Erro ao criar produto:', err);
+      return res.status(500).json({ message: 'Erro interno ao criar produto.' });
     }
   },
 
   // ATUALIZAR
   async update(req, res) {
-    const { id } = req.params;
-    const { data, error } = await supabase.from('products').update(req.body).eq('id', id).select();
-    if (error) return res.status(500).json(error);
-    return res.status(200).json(data[0]);
+    try {
+      const { id } = req.params;
+
+      // Busca o produto atual para preservar o SKU do produto e os ids das variações
+      const { data: existing, error: fetchError } = await supabase
+        .from('products').select('sku, variants').eq('id', id).single();
+      if (fetchError || !existing) return res.status(404).json({ message: 'Produto não encontrado.' });
+
+      const payload = { ...req.body };
+      // Nunca deixa o front sobrescrever o SKU do produto
+      delete payload.sku;
+
+      // Se vierem variações, normaliza preservando ids existentes
+      if (req.body.variants !== undefined) {
+        payload.variants = normalizeVariants(existing.sku, req.body.variants, existing.variants || []);
+      }
+
+      const { data, error } = await supabase
+        .from('products').update(payload).eq('id', id).select();
+      if (error) throw error;
+
+      return res.status(200).json(data[0]);
+    } catch (err) {
+      console.error('Erro ao atualizar produto:', err);
+      return res.status(500).json({ message: 'Erro interno ao atualizar produto.' });
+    }
   },
 
   // DELETAR
   async delete(req, res) {
     try {
       const { id } = req.params;
-      const operatorEmail = req.currentUserEmail; // Capturado pelo middleware de autorização
+      const operatorEmail = req.currentUserEmail;
 
-      // Busca o nome do produto antes de deletar para colocar no histórico
       const { data: product } = await supabase.from('products').select('name').eq('id', id).single();
 
       const { error } = await supabase.from('products').delete().eq('id', id);
       if (error) throw error;
 
-      // Registra a ação na tabela de auditoria
       await AuditService.log(
-        operatorEmail, 
-        'EXCLUSÃO_PRODUTO', 
+        operatorEmail,
+        'EXCLUSÃO_PRODUTO',
         `O produto "${product?.name || 'ID: ' + id}" foi removido definitivamente do inventário.`
       );
 
@@ -101,76 +128,49 @@ const ProductController = {
     }
   },
 
-  // REGISTRAR VENDA
+  // REGISTRAR VENDA (mantido por índice; a Fase 1 migra para id da variação)
   async registerSale(req, res) {
     const { id } = req.params;
-    const variantIndex = req.body.variantIndex || 0; 
+    const variantIndex = req.body.variantIndex || 0;
     const quantity = req.body.quantity || 1;
-    const customerId = req.body.customer_id || null; // Corrigido a declaração que faltava aqui
+    const customerId = req.body.customer_id || null;
 
     try {
-      // 1. Buscamos o produto atual
       const { data: product, error: fetchError } = await supabase
-        .from('products')
-        .select('*')
-        .eq('id', id)
-        .single();
-
+        .from('products').select('*').eq('id', id).single();
       if (fetchError || !product) return res.status(404).json({ message: 'Produto não encontrado.' });
 
       let updatedVariants = [...product.variants];
       let currentStock = updatedVariants[variantIndex].stock || 0;
-
       if (currentStock < quantity) return res.status(400).json({ message: 'Estoque insuficiente!' });
 
-      // 2. Subtraímos o estoque
       updatedVariants[variantIndex].stock = currentStock - quantity;
 
-      // 3. Salvamos a atualização do produto
       const { error: updateError } = await supabase
-        .from('products')
-        .update({ variants: updatedVariants })
-        .eq('id', id);
-
+        .from('products').update({ variants: updatedVariants }).eq('id', id);
       if (updateError) return res.status(500).json({ message: 'Erro ao atualizar o estoque.' });
 
-      // ==========================================
-      // 4. REGISTRAR NO HISTÓRICO DE VENDAS
-      // ==========================================
       const variantDetails = `Cor: ${updatedVariants[variantIndex].color} | Tam: ${updatedVariants[variantIndex].size}`;
-      
-      const { error: saleError } = await supabase
-        .from('sales')
-        .insert([{
-          product_id: id,
-          product_name: product.name,
-          variant_info: variantDetails,
-          quantity: quantity,
-          customer_id: customerId // Agora a variável existe
-        }]);
+      const { error: saleError } = await supabase.from('sales').insert([{
+        product_id: id,
+        product_name: product.name,
+        variant_info: variantDetails,
+        quantity: quantity,
+        customer_id: customerId
+      }]);
+      if (saleError) console.error('Aviso: Venda feita, mas erro ao salvar histórico:', saleError);
 
-      if (saleError) console.error("Aviso: Venda feita, mas erro ao salvar histórico:", saleError);
-
-      // ==========================================
-      // 5. AUTOMAÇÃO FINANCEIRA
-      // ==========================================
-      // Verifica se o produto tem preço cadastrado. Se tiver, lança no caixa!
       if (product.price && product.price > 0) {
         const totalValue = product.price * quantity;
-        
-        const { error: financeError } = await supabase
-          .from('financial_transactions')
-          .insert([{
-            type: 'ENTRADA',
-            amount: totalValue,
-            description: `Venda Automática: ${quantity}x ${product.name}`
-          }]);
-          
-        if (financeError) console.error("Aviso: Erro ao lançar no financeiro:", financeError);
+        const { error: financeError } = await supabase.from('financial_transactions').insert([{
+          type: 'ENTRADA',
+          amount: totalValue,
+          description: `Venda Automática: ${quantity}x ${product.name}`
+        }]);
+        if (financeError) console.error('Aviso: Erro ao lançar no financeiro:', financeError);
       }
 
       return res.status(200).json({ message: 'Venda registrada com sucesso e gravada no histórico!' });
-
     } catch (err) {
       console.error(err);
       return res.status(500).json({ message: 'Erro interno no servidor.' });

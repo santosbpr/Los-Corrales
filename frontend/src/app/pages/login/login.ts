@@ -34,13 +34,14 @@ export class LoginComponent {
           this.isLoading = false;
           this.notificationService.success('Bem-vindo ao Los Corrales!');
 
-          // O role vem do backend (lido de profiles). Default seguro: CAIXA.
           const userRole = String(response.user?.role || 'CAIXA').toUpperCase();
-
           this.router.navigate([userRole === 'ADMIN' ? '/dashboard' : '/pdv']);
         },
         error: (err) => {
           this.isLoading = false;
+          // Detalhe técnico no console (code/detail) para diagnóstico
+          console.error('Falha no login:', err.error || err);
+          // Mostra o motivo real vindo do backend
           this.notificationService.error(err.error?.message || 'Falha ao fazer login');
         }
       });

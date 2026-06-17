@@ -1,154 +1,131 @@
-<div style="font-family: Arial, sans-serif; padding: 30px; background-color: #f8f9fa; min-height: 100vh;">
-  
-  <h2 style="margin-bottom: 5px; color: #1a1a1a;">⚙️ Configurações Globais do ERP</h2>
-  <p style="color: #666; margin-bottom: 30px; font-size: 14px;">Gerencie as propriedades oficiais dos itens de vestuário da Los Corrales</p>
-  
-  <hr style="border: 0; border-top: 1px solid #ddd; margin-bottom: 30px;">
+<div class="page">
 
-  <div style="display: flex; gap: 30px; flex-wrap: wrap;">
-    
-    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
-      <h3 style="margin-top: 0; color: #333; font-size: 16px;">🎨 Paleta de Cores Disponíveis</h3>
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 20px; margin-top: 15px;">
-        <input type="text" [(ngModel)]="newColorName" placeholder="Ex: Vermelho Campeiro"
-               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none;">
-        <button (click)="salvarCor()" style="padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
-          + Adicionar
-        </button>
+  <h2 class="page-title">⚙️ Configurações Globais do ERP</h2>
+  <p class="page-subtitle">Gerencie as propriedades oficiais dos itens de vestuário da Los Corrales</p>
+
+  <hr class="divider">
+
+  <div class="settings-grid">
+
+    <!-- Cores -->
+    <div class="card">
+      <h3 class="card-title">🎨 Paleta de Cores Disponíveis</h3>
+      <div class="add-row">
+        <input class="form-input" type="text" [(ngModel)]="newColorName" placeholder="Ex: Vermelho Campeiro">
+        <button class="btn btn-add" (click)="salvarCor()">+ Adicionar</button>
       </div>
-
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-        <tr style="background: #f1f1f1; text-align: left;">
-          <th style="padding: 10px; border-bottom: 2px solid #ddd;">Nome da Cor</th>
-          <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right;">Ações</th>
-        </tr>
-        <tr *ngFor="let c of colors" style="border-bottom: 1px solid #eee;">
-          <td style="padding: 10px; color: #555; font-weight: 500;">{{ c.name }}</td>
-          <td style="padding: 10px; text-align: right;">
-            <button (click)="excluirCor(c.id, c.name)" style="background: transparent; border: none; cursor: pointer; font-size: 16px;" title="Remover">🗑️</button>
-          </td>
-        </tr>
-      </table>
+      <div class="scroll-box">
+        <table class="premium-table">
+          <thead><tr><th>Nome da Cor</th><th class="text-right">Ações</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let c of colors">
+              <td><strong>{{ c.name }}</strong></td>
+              <td class="text-right"><button class="btn-icon" (click)="excluirCor(c.id, c.name)" title="Remover">🗑️</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
-      <h3 style="margin-top: 0; color: #333; font-size: 16px;">📏 Grade de Tamanhos (Numeração/Letras)</h3>
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 20px; margin-top: 15px;">
-        <input type="text" [(ngModel)]="newSizeName" placeholder="Ex: GG ou 42"
-               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none;">
-        <button (click)="salvarTamanho()" style="padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
-          + Adicionar
-        </button>
+    <!-- Tamanhos -->
+    <div class="card">
+      <h3 class="card-title">📏 Grade de Tamanhos</h3>
+      <div class="add-row">
+        <input class="form-input" type="text" [(ngModel)]="newSizeName" placeholder="Ex: GG ou 42">
+        <button class="btn btn-add" (click)="salvarTamanho()">+ Adicionar</button>
       </div>
-
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-        <tr style="background: #f1f1f1; text-align: left;">
-          <th style="padding: 10px; border-bottom: 2px solid #ddd;">Tamanho</th>
-          <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right;">Ações</th>
-        </tr>
-        <tr *ngFor="let s of sizes" style="border-bottom: 1px solid #eee;">
-          <td style="padding: 10px; color: #555; font-weight: bold;">{{ s.name }}</td>
-          <td style="padding: 10px; text-align: right;">
-            <button (click)="excluirTamanho(s.id, s.name)" style="background: transparent; border: none; cursor: pointer; font-size: 16px;" title="Remover">🗑️</button>
-          </td>
-        </tr>
-      </table>
+      <div class="scroll-box">
+        <table class="premium-table">
+          <thead><tr><th>Tamanho</th><th class="text-right">Ações</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let s of sizes">
+              <td><strong>{{ s.name }}</strong></td>
+              <td class="text-right"><button class="btn-icon" (click)="excluirTamanho(s.id, s.name)" title="Remover">🗑️</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
-      <h3 style="margin-top: 0; color: #333; font-size: 16px;"> Grade de Categorias</h3>
-      
-      <div style="display: flex; gap: 10px; margin-bottom: 20px; margin-top: 15px;">
-        <input type="text" [(ngModel)]="newCategoryName" placeholder="Ex: Calçados, Camisas, Acessórios etc."
-               style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; outline: none;">
-        <button (click)="salvarCategoria()" style="padding: 10px 15px; background: #28a745; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;">
-          + Adicionar
-        </button>
+    <!-- Categorias -->
+    <div class="card">
+      <h3 class="card-title">📂 Grade de Categorias</h3>
+      <div class="add-row">
+        <input class="form-input" type="text" [(ngModel)]="newCategoryName" placeholder="Ex: Calçados, Camisas etc.">
+        <button class="btn btn-add" (click)="salvarCategoria()">+ Adicionar</button>
       </div>
-
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-        <tr style="background: #f1f1f1; text-align: left;">
-          <th style="padding: 10px; border-bottom: 2px solid #ddd;">Categoria</th>
-          <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right;">Ações</th>
-        </tr>
-        <tr *ngFor="let c of categories" style="border-bottom: 1px solid #eee;">
-          <td style="padding: 10px; color: #555; font-weight: bold;">{{ c.name }}</td>
-          <td style="padding: 10px; text-align: right;">
-            <button (click)="excluirCategoria(c.id, c.name)" style="background: transparent; border: none; cursor: pointer; font-size: 16px;" title="Remover">🗑️</button>
-          </td>
-        </tr>
-      </table>
+      <div class="scroll-box">
+        <table class="premium-table">
+          <thead><tr><th>Categoria</th><th class="text-right">Ações</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let c of categories">
+              <td><strong>{{ c.name }}</strong></td>
+              <td class="text-right"><button class="btn-icon" (click)="excluirCategoria(c.id, c.name)" title="Remover">🗑️</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
-      <h3 style="margin-top: 0; color: #333; font-size: 16px;">👥 Registar Novo Funcionário</h3>
-      <p style="color: #666; font-size: 12px; margin-bottom: 15px;">Crie acessos para a sua equipa (Caixa ou Administrador).</p>
-      
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        
-        <div>
-          <label style="font-size: 12px; font-weight: bold; color: #555;">E-mail do Funcionário</label>
-          <input type="email" [(ngModel)]="newUser.email" placeholder="caixa@loscorrales.com"
-                 style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; outline: none; box-sizing: border-box;">
+    <!-- Usuários -->
+    <div class="card">
+      <h3 class="card-title">🔑 Usuários do Sistema</h3>
+      <p class="page-subtitle" style="margin: 0 0 15px 0; font-size: 0.8rem;">Redefina a senha de qualquer funcionário (Administrador ou Caixa).</p>
+      <div class="scroll-box">
+        <table class="premium-table">
+          <thead><tr><th>E-mail</th><th>Cargo</th><th class="text-right">Ações</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let u of users">
+              <td>{{ u.email }}</td>
+              <td>
+                <span class="badge" [class.badge-admin]="u.role === 'ADMIN'" [class.badge-caixa]="u.role !== 'ADMIN'">
+                  {{ u.role }}
+                </span>
+              </td>
+              <td class="text-right user-actions">
+                <button class="btn btn-danger" (click)="resetarSenha(u)" [disabled]="resettingEmail === u.email">
+                  {{ resettingEmail === u.email ? 'Resetando...' : 'Resetar senha' }}
+                </button>
+                <button class="btn-icon" (click)="excluirUtilizador(u)" title="Excluir Usuário de Forma Definitiva" style="margin-left: 8px;">🗑️</button>
+              </td>
+            </tr>
+            <tr *ngIf="users.length === 0">
+              <td colspan="3" class="empty-row">Nenhum usuário carregado.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Registar novo funcionário -->
+    <div class="card">
+      <h3 class="card-title">👥 Registar Novo Funcionário</h3>
+      <p class="page-subtitle" style="margin: 0 0 15px 0; font-size: 0.8rem;">Crie acessos para a sua equipa (Caixa ou Administrador).</p>
+
+      <div class="register-form">
+        <div class="form-group">
+          <label class="form-label">E-mail do Funcionário</label>
+          <input class="form-input" type="email" [(ngModel)]="newUser.email" placeholder="caixa@loscorrales.com">
         </div>
 
-        <div>
-          <label style="font-size: 12px; font-weight: bold; color: #555;">Palavra-passe provisória</label>
-          <input type="password" [(ngModel)]="newUser.password" placeholder="••••••••"
-                 style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; outline: none; box-sizing: border-box;">
+        <div class="form-group">
+          <label class="form-label">Palavra-passe provisória</label>
+          <input class="form-input" type="password" [(ngModel)]="newUser.password" placeholder="••••••••">
         </div>
 
-        <div>
-          <label style="font-size: 12px; font-weight: bold; color: #555;">Nível de Acesso (Cargo)</label>
-          <select [(ngModel)]="newUser.role" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; outline: none; box-sizing: border-box;">
+        <div class="form-group">
+          <label class="form-label">Nível de Acesso (Cargo)</label>
+          <select class="form-select" [(ngModel)]="newUser.role">
             <option value="CAIXA">Operador de Caixa (Vendas apenas)</option>
             <option value="ADMIN">Administrador (Acesso Total)</option>
           </select>
         </div>
 
-        <button (click)="salvarUtilizador()" [disabled]="isCreatingUser"
-                style="margin-top: 10px; padding: 12px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;"
-                [style.opacity]="isCreatingUser ? 0.6 : 1">
+        <button class="btn btn-primary btn-block" (click)="salvarUtilizador()" [disabled]="isCreatingUser">
           {{ isCreatingUser ? 'Registando...' : 'Registar Utilizador' }}
         </button>
-
       </div>
     </div>
-
-    <div style="flex: 1; min-width: 300px; background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 4px 6px rgba(0,0,0,0.01);">
-      <h3 style="margin-top: 0; color: #333; font-size: 16px;">🔑 Usuários do Sistema</h3>
-      <p style="color: #666; font-size: 12px; margin-bottom: 15px;">Redefina a senha de qualquer funcionário (Administrador ou Caixa).</p>
-
-      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-        <tr style="background: #f1f1f1; text-align: left;">
-          <th style="padding: 10px; border-bottom: 2px solid #ddd;">E-mail</th>
-          <th style="padding: 10px; border-bottom: 2px solid #ddd;">Cargo</th>
-          <th style="padding: 10px; border-bottom: 2px solid #ddd; text-align: right;">Ações</th>
-        </tr>
-        <tr *ngFor="let u of users" style="border-bottom: 1px solid #eee;">
-          <td style="padding: 10px; color: #555;">{{ u.email }}</td>
-          <td style="padding: 10px;">
-            <span [style.background]="u.role === 'ADMIN' ? '#000' : '#6c757d'"
-                  style="color: white; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: bold;">
-              {{ u.role }}
-            </span>
-          </td>
-          <td style="padding: 10px; text-align: right;">
-            <button (click)="resetarSenha(u)" [disabled]="resettingEmail === u.email"
-                    style="padding: 6px 12px; background: #d33; color: white; border: none; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer;"
-                    [style.opacity]="resettingEmail === u.email ? 0.6 : 1">
-              {{ resettingEmail === u.email ? 'Resetando...' : 'Resetar senha' }}
-            </button>
-          </td>
-        </tr>
-        <tr *ngIf="users.length === 0">
-          <td colspan="3" style="padding: 15px; text-align: center; color: #999;">Nenhum usuário carregado.</td>
-        </tr>
-      </table>
-    </div>
-
 
   </div>
 </div>

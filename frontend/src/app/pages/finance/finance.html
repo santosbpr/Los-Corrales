@@ -1,76 +1,74 @@
-<div style="font-family: Arial, sans-serif; padding: 30px; background-color: #f8f9fa; min-height: 100vh;">
-  
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-    <h2 style="margin: 0; color: #1a1a1a;">💰 Controle Financeiro</h2>
-    <div style="background: #fff; padding: 10px 20px; border-radius: 8px; border: 1px solid #ddd; font-size: 20px; font-weight: bold;"
-         [ngStyle]="{'color': getSaldoTotal() >= 0 ? '#28a745' : '#dc3545'}">
+<div class="page">
+
+  <div class="finance-header">
+    <h2 class="page-title" style="margin: 0;">💰 Controle Financeiro</h2>
+    <div class="saldo-box" [class.negative]="getSaldoTotal() < 0">
       Saldo: {{ getSaldoTotal() | currency:'BRL':'symbol':'1.2-2' }}
     </div>
   </div>
-  
-  <p style="color: #666; margin-bottom: 30px; font-size: 14px;">Extrato de vendas automáticas e lançamentos manuais.</p>
-  <hr style="border: 0; border-top: 1px solid #ddd; margin-bottom: 30px;">
 
-  <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <h3 style="margin-top: 0; color: #333; font-size: 16px;">Novo Lançamento</h3>
-    
-    <div style="display: flex; gap: 15px; align-items: flex-end; margin-top: 15px;">
-      
-      <div style="flex: 1;">
-        <label style="font-size: 12px; font-weight: bold; color: #555;">Tipo</label>
-        <select [(ngModel)]="newTransaction.type" style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px;">
+  <p class="page-subtitle">Extrato de vendas automáticas e lançamentos manuais.</p>
+  <hr class="divider">
+
+  <div class="card">
+    <h3 class="card-title">Novo Lançamento</h3>
+
+    <div class="form-row align-end">
+      <div class="form-group">
+        <label class="form-label">Tipo</label>
+        <select class="form-select" [(ngModel)]="newTransaction.type">
           <option value="ENTRADA">Entrada (+)</option>
           <option value="SAÍDA">Saída (-)</option>
         </select>
       </div>
 
-      <div style="flex: 1;">
-        <label style="font-size: 12px; font-weight: bold; color: #555;">Valor (R$)</label>
-        <input type="number" [(ngModel)]="newTransaction.amount" placeholder="0.00"
-               style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+      <div class="form-group">
+        <label class="form-label">Valor (R$)</label>
+        <input class="form-input" type="number" [(ngModel)]="newTransaction.amount" placeholder="0.00">
       </div>
 
-      <div style="flex: 3;">
-        <label style="font-size: 12px; font-weight: bold; color: #555;">Descrição</label>
-        <input type="text" [(ngModel)]="newTransaction.description" placeholder="Ex: Conta de Luz, Pagamento Fornecedor"
-               style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+      <div class="form-group grow-3">
+        <label class="form-label">Descrição</label>
+        <input class="form-input" type="text" [(ngModel)]="newTransaction.description" placeholder="Ex: Conta de Luz, Pagamento Fornecedor">
       </div>
 
-      <div>
-        <button (click)="registrarLancamento()" [disabled]="isSaving"
-                style="padding: 10px 20px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;"
-                [style.opacity]="isSaving ? 0.6 : 1">
+      <div class="form-group no-grow">
+        <button class="btn btn-primary" (click)="registrarLancamento()" [disabled]="isSaving">
           {{ isSaving ? 'Lançando...' : 'Lançar' }}
         </button>
       </div>
     </div>
   </div>
 
-  <div style="background: white; padding: 20px; border-radius: 8px; border: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-    <h3 style="margin-top: 0; color: #333; font-size: 16px; margin-bottom: 20px;">Extrato Geral</h3>
-    
-    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-      <tr style="background: #f1f1f1; text-align: left;">
-        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Data</th>
-        <th style="padding: 12px; border-bottom: 2px solid #ddd;">Descrição</th>
-        <th style="padding: 12px; border-bottom: 2px solid #ddd; text-align: right;">Valor</th>
-      </tr>
-      
-      <tr *ngFor="let t of transactions" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 12px; color: #666;">{{ t.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
-        <td style="padding: 12px; color: #333; font-weight: bold;">
-          <span *ngIf="t.description.includes('Venda Automática') || t.description.includes('IoT')">🤖 </span>
-          {{ t.description }}
-        </td>
-        <td style="padding: 12px; text-align: right; font-weight: bold;" 
-            [ngStyle]="{'color': t.type === 'ENTRADA' ? '#28a745' : '#dc3545'}">
-          {{ t.type === 'ENTRADA' ? '+' : '-' }} {{ t.amount | currency:'BRL':'symbol':'1.2-2' }}
-        </td>
-      </tr>
-      
-      <tr *ngIf="transactions.length === 0">
-        <td colspan="3" style="padding: 20px; text-align: center; color: #999;">Nenhuma movimentação registrada.</td>
-      </tr>
-    </table>
+  <div class="card">
+    <h3 class="card-title">Extrato Geral</h3>
+
+    <div class="table-wrapper">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Descrição</th>
+            <th class="text-right">Valor</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let t of transactions">
+            <td>{{ t.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              <span *ngIf="t.description.includes('Venda Automática') || t.description.includes('IoT')">🤖 </span>
+              <strong>{{ t.description }}</strong>
+            </td>
+            <td class="text-right value" [class.value-in]="t.type === 'ENTRADA'" [class.value-out]="t.type !== 'ENTRADA'">
+              {{ t.type === 'ENTRADA' ? '+' : '-' }} {{ t.amount | currency:'BRL':'symbol':'1.2-2' }}
+            </td>
+          </tr>
+          <tr *ngIf="transactions.length === 0">
+            <td colspan="3" class="empty-row">Nenhuma movimentação registrada.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
+
 </div>

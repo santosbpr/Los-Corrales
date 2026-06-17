@@ -6,7 +6,8 @@ import { DashboardService } from '../../services/dashboard.service';
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './dashboard.html'
+  templateUrl: './dashboard.html',
+  styleUrl: './dashboard.scss'
 })
 export class DashboardComponent implements OnInit {
   totalRevenue: number = 0;

@@ -1,74 +1,61 @@
-<div style="font-family: Arial, sans-serif; padding: 30px; background-color: #f8f9fa; min-height: 100vh;">
-  
-  <h2 style="margin-bottom: 5px; color: #1a1a1a;">🛒 Frente de Caixa / PDV</h2>
-  <p style="color: #666; margin-bottom: 30px; font-size: 14px;">Registre a saída de mercadorias em tempo real</p>
-  
-  <hr style="border: 0; border-top: 1px solid #ddd; margin-bottom: 30px;">
+<div class="page">
 
-  <div style="background: #e8f5e9; border: 2px dashed #28a745; border-radius: 8px; padding: 25px; text-align: center; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.02);">
-    <h3 style="margin-top: 0; color: #2e7d32; font-size: 18px;">📟 Modo de Leitura Rápida Ativo</h3>
-    <p style="color: #4a4a4a; font-size: 14px; margin-bottom: 20px;">Clique no campo abaixo e passe o produto no leitor para registar a venda automaticamente.</p>
-    
-    <input 
-      type="text" 
-      [(ngModel)]="scannedCode" 
-      (keyup.enter)="processarLeitura()" 
-      placeholder="Aguardando bip do leitor..." 
-      autofocus
-      style="width: 100%; max-width: 500px; padding: 15px; font-size: 18px; border: 2px solid #28a745; border-radius: 5px; text-align: center; outline: none; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);">
+  <h2 class="page-title">🛒 Frente de Caixa / PDV</h2>
+  <p class="page-subtitle">Registre a saída de mercadorias em tempo real</p>
+
+  <hr class="divider">
+
+  <div class="scan-box">
+    <h3 class="scan-title">📟 Modo de Leitura Rápida Ativo</h3>
+    <p class="scan-hint">Clique no campo abaixo e passe o produto no leitor para registar a venda automaticamente.</p>
+    <input class="scan-input" type="text" [(ngModel)]="scannedCode" (keyup.enter)="processarLeitura()"
+           placeholder="Aguardando bip do leitor..." autofocus>
   </div>
 
-  <div style="display: flex; gap: 30px; flex-wrap: wrap;">
-    
-    <div style="flex: 1; min-width: 320px; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); border: 1px solid #e0e0e0;">
-      <h3 style="margin-top: 0; margin-bottom: 20px; font-size: 18px; color: #333;">Lançamento Manual</h3>
+  <div class="pdv-columns">
 
-      <div style="display: flex; flex-direction: column; gap: 20px;">
-        
-        <div>
-          <label style="font-size: 13px; font-weight: bold; color: #4a4a4a; text-transform: uppercase;">Item de Vestuário</label>
-          <select [(ngModel)]="selectedProduct" (change)="onProductChange()" 
-                  style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ccc; border-radius: 6px; outline: none; font-size: 15px;">
+    <div class="pdv-col card">
+      <h3 class="card-title">Lançamento Manual</h3>
+
+      <div class="form-vertical">
+        <div class="form-group">
+          <label class="form-label">Item de Vestuário</label>
+          <select class="form-select" [(ngModel)]="selectedProduct" (change)="onProductChange()">
             <option [ngValue]="null" disabled selected>Escolha um produto...</option>
             <option *ngFor="let p of products" [ngValue]="p">{{ p.name }} ({{ p.category }})</option>
           </select>
         </div>
 
-        <div *ngIf="selectedProduct">
-          <label style="font-size: 13px; font-weight: bold; color: #4a4a4a; text-transform: uppercase;">Variação / Tamanho</label>
-          <select [(ngModel)]="selectedVariantIndex" 
-                  style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ccc; border-radius: 6px; outline: none; font-size: 15px;">
+        <div class="form-group" *ngIf="selectedProduct">
+          <label class="form-label">Variação / Tamanho</label>
+          <select class="form-select" [(ngModel)]="selectedVariantIndex">
             <option *ngFor="let v of selectedProduct.variants; let i = index" [value]="i">
               Cor: {{ v.color }} | Tam: {{ v.size }}
             </option>
           </select>
         </div>
 
-        <div>
-          <label style="font-size: 13px; font-weight: bold; color: #4a4a4a; text-transform: uppercase;">Quantidade Vendida</label>
-          <input type="number" [(ngModel)]="quantity" min="1" 
-                 style="width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ccc; border-radius: 6px; outline: none; font-size: 15px;">
+        <div class="form-group">
+          <label class="form-label">Quantidade Vendida</label>
+          <input class="form-input" type="number" [(ngModel)]="quantity" min="1">
         </div>
 
-        <button (click)="finalizarVenda()" [disabled]="!selectedProduct || isProcessing"
-                style="width: 100%; padding: 15px; background: #000; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 16px; cursor: pointer; transition: background 0.2s; margin-top: 10px;"
-                [style.opacity]="(!selectedProduct || isProcessing) ? 0.6 : 1">
+        <button class="btn btn-primary btn-block" (click)="finalizarVenda()" [disabled]="!selectedProduct || isProcessing">
           {{ isProcessing ? 'Processando...' : 'Confirmar Saída Manual' }}
         </button>
-
       </div>
     </div>
 
-    <div style="flex: 1; min-width: 320px; display: flex; flex-direction: column; justify-content: flex-start;">
-      <div *ngIf="selectedProduct" style="background: #1a1a1a; color: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-        <h4 style="margin: 0; text-transform: uppercase; font-size: 12px; color: #aaa; letter-spacing: 1px;">Verificação de Disponibilidade</h4>
-        <h2 style="margin: 10px 0 5px 0; font-size: 24px;">{{ selectedProduct.name }}</h2>
-        <span style="background: #333; padding: 4px 10px; border-radius: 20px; font-size: 12px;">{{ selectedProduct.category }}</span>
+    <div class="pdv-col">
+      <div class="stock-card" *ngIf="selectedProduct">
+        <h4 class="sc-label">Verificação de Disponibilidade</h4>
+        <h2 class="sc-name">{{ selectedProduct.name }}</h2>
+        <span class="sc-cat">{{ selectedProduct.category }}</span>
 
-        <div style="margin-top: 30px; border-top: 1px solid #333; padding-top: 20px;">
-          <p style="margin: 0; color: #aaa; font-size: 14px;">Estoque atual desta variação:</p>
-          <h1 style="margin: 10px 0 0 0; font-size: 56px; color: #28a745;">
-            {{ selectedProduct.variants[selectedVariantIndex]?.stock || 0 }} <span style="font-size: 18px; color: #fff;">unidades</span>
+        <div class="sc-divider">
+          <p class="sc-current">Estoque atual desta variação:</p>
+          <h1 class="sc-stock">
+            {{ selectedProduct.variants[selectedVariantIndex]?.stock || 0 }} <small>unidades</small>
           </h1>
         </div>
       </div>

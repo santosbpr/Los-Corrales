@@ -90,18 +90,24 @@
 .badge { display: inline-block; color: #fff; padding: 3px 10px; border-radius: 12px;
   font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
 
-/* ===== Dashboard ===== */
-.kpi-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 40px; }
-.kpi-card {
-  background: #fff; border-radius: 12px; padding: 22px; min-width: 240px; flex: 1;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05); border-left: 5px solid #ccc;
+/* ===== PDV ===== */
+.scan-box { background: #e8f5e9; border: 2px dashed #28a745; border-radius: 12px; padding: 25px; text-align: center; margin-bottom: 30px; }
+.scan-box .scan-title { margin-top: 0; color: #2e7d32; font-size: 1.1rem; }
+.scan-box .scan-hint { color: #4a4a4a; font-size: 0.9rem; margin-bottom: 20px; }
+.scan-input {
+  width: 100%; max-width: 500px; padding: 15px; font-size: 1.1rem;
+  border: 2px solid #28a745; border-radius: 8px; text-align: center; outline: none;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
 }
-.kpi-card .kpi-label { margin: 0; color: #666; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
-.kpi-card .kpi-value { font-size: 2rem; font-weight: 700; margin: 10px 0 0 0; }
-.kpi-card.kpi-revenue { border-left-color: #28a745; .kpi-value { color: #28a745; } }
-.kpi-card.kpi-items   { border-left-color: #007bff; .kpi-value { color: #007bff; } }
 
-.alert-title { margin: 0 0 5px 0; color: #dc3545; font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
-.alert-sub { color: #666; font-size: 0.9rem; margin-bottom: 20px; }
-.empty-ok { padding: 20px; background: #e8f5e9; color: #2e7d32; border-radius: 8px; text-align: center; font-weight: 700; }
-.stock-badge { background: #dc3545; color: #fff; padding: 4px 12px; border-radius: 20px; font-weight: 700; }
+.pdv-columns { display: flex; gap: 30px; flex-wrap: wrap; }
+.pdv-col { flex: 1; min-width: 320px; }
+
+.stock-card { background: #1a1a1a; color: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); }
+.stock-card .sc-label { margin: 0; text-transform: uppercase; font-size: 0.72rem; color: #aaa; letter-spacing: 1px; }
+.stock-card .sc-name { margin: 10px 0 5px 0; font-size: 1.5rem; }
+.stock-card .sc-cat { background: #333; padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; }
+.stock-card .sc-divider { margin-top: 30px; border-top: 1px solid #333; padding-top: 20px; }
+.stock-card .sc-current { margin: 0; color: #aaa; font-size: 0.9rem; }
+.stock-card .sc-stock { margin: 10px 0 0 0; font-size: 3.2rem; color: #28a745; line-height: 1; }
+.stock-card .sc-stock small { font-size: 1.1rem; color: #fff; }
