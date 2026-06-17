@@ -40,7 +40,12 @@ const UserController = {
         return res.status(404).json({ message: 'Usuário não encontrado na autenticação.' });
       }
 
-      const { error: updError } = await supabase.auth.admin.updateUserById(target.id, { password });
+      // Define a senha e, de quebra, confirma o e-mail — assim contas pendentes
+      // ("waiting for verification") passam a conseguir logar.
+      const { error: updError } = await supabase.auth.admin.updateUserById(target.id, {
+        password,
+        email_confirm: true
+      });
       if (updError) throw updError;
 
       await AuditService.log(
