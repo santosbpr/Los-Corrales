@@ -170,8 +170,7 @@ export class ProfileComponent implements OnInit {
   excluirUtilizador(user: any) {
     this.notification.confirmDelete(user.email).then((result) => {
       if (result.isConfirmed) {
-        // Nota: Certifique-se de que o método no seu 'userService' se chama 'deleteUser'
-        this.userService.deleteUser(user.id).subscribe({
+        this.userService.deleteUser(user.email).subscribe({
           next: () => {
             this.notification.success(`O acesso de ${user.email} foi removido com sucesso!`);
             this.loadUsers(); // Recarrega a listagem de usuários na tela
