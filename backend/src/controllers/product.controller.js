@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const supabase = require('../config/supabase');
 const AuditService = require('../services/audit.service');
+const { recordSale } = require('../services/sale.service');
 
 // SKU/barcode determinístico de uma variação: PRODUTO-COR-TAMANHO
 function makeVariantSku(productSku, v) {
@@ -150,25 +151,25 @@ const ProductController = {
         .from('products').update({ variants: updatedVariants }).eq('id', id);
       if (updateError) return res.status(500).json({ message: 'Erro ao atualizar o estoque.' });
 
-      const variantDetails = `Cor: ${updatedVariants[variantIndex].color} | Tam: ${updatedVariants[variantIndex].size}`;
-      const { error: saleError } = await supabase.from('sales').insert([{
-        product_id: id,
-        product_name: product.name,
-        variant_info: variantDetails,
-        quantity: quantity,
-        customer_id: customerId
-      }]);
-      if (saleError) console.error('Aviso: Venda feita, mas erro ao salvar histórico:', saleError);
+      const variant = updatedVariants[variantIndex];
+      const variantDetails = `Cor: ${variant.color} | Tam: ${variant.size}`;
 
-      if (product.price && product.price > 0) {
-        const totalValue = product.price * quantity;
-        const { error: financeError } = await supabase.from('financial_transactions').insert([{
-          type: 'ENTRADA',
-          amount: totalValue,
-          description: `Venda Automática: ${quantity}x ${product.name}`
-        }]);
-        if (financeError) console.error('Aviso: Erro ao lançar no financeiro:', financeError);
-      }
+      // Venda como transação: cabeçalho + item, e lançamento financeiro pelo total.
+      await recordSale({
+        customer_id: customerId,
+        operator_email: req.currentUserEmail || req.headers['user-email'] || null,
+        payment_method: req.body.payment_method || 'DINHEIRO',
+        source: 'PDV',
+        items: [{
+          product_id: id,
+          variant_id: variant.id || null,
+          product_name: product.name,
+          variant_info: variantDetails,
+          quantity: quantity,
+          unit_price: product.price || 0,
+          unit_cost: product.cost || 0
+        }]
+      });
 
       return res.status(200).json({ message: 'Venda registrada com sucesso e gravada no histórico!' });
     } catch (err) {

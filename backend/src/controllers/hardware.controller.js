@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const { recordSale } = require('../services/sale.service');
 
 const HardwareController = {
   // Rota acionada pelo microcontrolador/leitor de código de barras
@@ -56,23 +57,24 @@ const HardwareController = {
       if (updateError) throw updateError;
 
       // 4. Registra no Histórico de Vendas
-      const variantDetails = `Cor: ${updatedVariants[targetVariantIndex].color} | Tam: ${updatedVariants[targetVariantIndex].size} | 🤖 Lida via Hardware`;
-      
-      await supabase.from('sales').insert([{
-        product_id: targetProduct.id,
-        product_name: targetProduct.name,
-        variant_info: variantDetails,
-        quantity: 1
-      }]);
+      const v = updatedVariants[targetVariantIndex];
+      const variantDetails = `Cor: ${v.color} | Tam: ${v.size} | 🤖 Lida via Hardware`;
 
-      // 5. Automatiza o Lançamento Financeiro
-      if (targetProduct.price && targetProduct.price > 0) {
-        await supabase.from('financial_transactions').insert([{
-          type: 'ENTRADA',
-          amount: targetProduct.price,
-          description: `Venda via IoT (SKU: ${tag_id}) - ${targetProduct.name}`
-        }]);
-      }
+      // Mesmo fluxo de venda (cabeçalho + item + financeiro) usado pelo PDV.
+      await recordSale({
+        operator_email: 'SISTEMA_IOT',
+        payment_method: 'DINHEIRO',
+        source: 'IoT',
+        items: [{
+          product_id: targetProduct.id,
+          variant_id: v.id || null,
+          product_name: targetProduct.name,
+          variant_info: variantDetails,
+          quantity: 1,
+          unit_price: targetProduct.price || 0,
+          unit_cost: targetProduct.cost || 0
+        }]
+      });
 
       // 6. Responde para o Arduino piscar o LED verde de sucesso
       return res.status(200).json({
