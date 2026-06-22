@@ -13,14 +13,14 @@ const DashboardController = {
       
       const totalRevenue = finances.reduce((acumulador, transacao) => acumulador + transacao.amount, 0);
 
-      // 2. Calcular o Total de Peças Vendidas
-      const { data: sales, error: salesError } = await supabase
-        .from('sales')
+      // 2. Calcular o Total de Peças Vendidas (quantidade agora vive em sale_items)
+      const { data: saleItems, error: salesError } = await supabase
+        .from('sale_items')
         .select('quantity');
-        
+
       if (salesError) throw salesError;
-      
-      const totalItemsSold = sales.reduce((acumulador, venda) => acumulador + venda.quantity, 0);
+
+      const totalItemsSold = (saleItems || []).reduce((acc, item) => acc + (item.quantity || 0), 0);
 
       // 3. Gerar Alerta de Estoque Baixo (Peças com menos de 3 unidades)
       const { data: products, error: productsError } = await supabase
