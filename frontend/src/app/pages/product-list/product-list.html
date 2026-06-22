@@ -35,7 +35,7 @@
             <span class="product-category">{{ product.category }}</span>
           </td>
           
-          <td class="text-center product-price">{{ product.price | currency:'EUR' }}</td>
+          <td class="text-center product-price">{{ product.price | currency:'BRL' }}</td>
           
           <td class="text-center qty-column">
             <strong>{{ product.quantity || product.stock || (product.variants && product.variants[0]?.stock) || '0' }}</strong>
