@@ -50,30 +50,55 @@ const CustomerController = {
     }
   },
 
-  // 4. Atualizar dados do cliente
+  // 4. Atualizar dados do cliente (auditando CADA campo alterado, com dados sensíveis mascarados)
   async updateCustomer(req, res) {
     try {
       const { id } = req.params;
       const updates = req.body;
       const operatorEmail = req.currentUserEmail;
 
-      // Busca os dados antigos para deixar o log rico em detalhes
-      const { data: oldData } = await supabase.from('customers').select('name').eq('id', id).single();
+      // Busca o registro antigo COMPLETO para comparar campo a campo
+      const { data: oldData } = await supabase.from('customers').select('*').eq('id', id).single();
 
       const { data, error } = await supabase.from('customers').update(updates).eq('id', id).select();
       if (error) throw error;
 
-      // REGISTRO DE AUDITORIA
-      await AuditService.log(
-        operatorEmail,
-        'ATUALIZAÇÃO_CLIENTE',
-        {
-          message: `Dados do cliente "${oldData?.name}" foram modificados.`,
-          alteracoes: updates // Salva o objeto com o que mudou diretamente no campo de detalhes
+      // Mascara valores sensíveis (cpf/email/telefone) no log de auditoria
+      const sensiveis = ['cpf', 'email', 'phone'];
+      const mascarar = (campo, valor) => {
+        if (valor === null || valor === undefined || valor === '') return '(vazio)';
+        const s = String(valor);
+        if (!sensiveis.includes(campo)) return s;
+        if (campo === 'email') {
+          const [u, dom] = s.split('@');
+          return dom ? `${u ? u[0] : ''}***@${dom}` : '***';
         }
-      );
+        const d = s.replace(/\D/g, '');
+        const visiveis = campo === 'cpf' ? 2 : 4;
+        return d.length > visiveis ? `***${d.slice(-visiveis)}` : '***';
+      };
 
-      return res.status(200).json({ message: 'Dados updated!', customer: data[0] });
+      // Monta o diff: somente os campos que realmente mudaram
+      const alteracoes = [];
+      if (oldData) {
+        for (const campo of Object.keys(updates)) {
+          const antes = oldData[campo];
+          const depois = updates[campo];
+          if (String(antes ?? '') !== String(depois ?? '')) {
+            alteracoes.push({ campo, de: mascarar(campo, antes), para: mascarar(campo, depois) });
+          }
+        }
+      }
+
+      // Só registra auditoria se algo de fato mudou
+      if (alteracoes.length > 0) {
+        await AuditService.log(operatorEmail, 'ATUALIZAÇÃO_CLIENTE', {
+          message: `Cliente "${oldData?.name || id}" editado: ${alteracoes.length} campo(s) alterado(s).`,
+          alteracoes
+        });
+      }
+
+      return res.status(200).json({ message: 'Cliente atualizado com sucesso!', customer: data[0] });
     } catch (err) {
       console.error("Erro ao atualizar cliente:", err);
       return res.status(500).json({ message: 'Erro ao atualizar dados do cliente.' });
