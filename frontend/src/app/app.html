@@ -115,8 +115,8 @@
 
       <nav style="display: flex; flex-direction: column; padding: 20px 10px; gap: 5px;">
         
-        @if (userRole === 'CASHIER' || userRole === 'ADMIN') {
-          <a routerLink="/products" routerLinkActive="active-link" class="menu-link">📦 Estoque</a>
+        @if (userRole === 'CAIXA' || userRole === 'ADMIN') {
+        <a routerLink="/products" routerLinkActive="active-link" class="menu-link">📦 Estoque</a>
         <a routerLink="/pdv" routerLinkActive="active-link" class="menu-link">🛒 Frente de Caixa (PDV)</a>
         }
         

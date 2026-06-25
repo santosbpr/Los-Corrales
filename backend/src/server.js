@@ -11,20 +11,18 @@ const hardwareRoutes = require('./routes/hardware.routes');
 const userRoutes = require('./routes/users.routes');
 const reportRoutes = require('./routes/reports.routes');
 const exchangeRoutes = require('./routes/exchanges.routes');
+const salesRoutes = require('./routes/sales.routes');
 
-// 1. Inicializa o aplicativo Express
 const app = express();
 
-// 2. Middlewares básicos
 app.use(cors());
 app.use(express.json());
 
-// Ping para manter o Render acordado
 app.get('/api/ping', (req, res) => {
   res.status(200).json({ message: 'Ping! O servidor do Los Corrales está acordado.' });
 });
 
-// 3. Rotas (cada prefixo registrado UMA vez)
+// Rotas (cada prefixo registrado UMA vez)
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/dashboard', dashboardRoutes);
@@ -35,16 +33,12 @@ app.use('/api/settings', settingsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/exchanges', exchangeRoutes);
+app.use('/api/sales', salesRoutes);
 
-// 4. Health check
 app.get('/', (req, res) => {
-  res.json({
-    message: 'API do ERP funcionando perfeitamente!',
-    version: '1.0.0'
-  });
+  res.json({ message: 'API do ERP funcionando perfeitamente!', version: '1.0.0' });
 });
 
-// 5. Porta e start
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

@@ -111,3 +111,10 @@
 .stock-card .sc-current { margin: 0; color: #aaa; font-size: 0.9rem; }
 .stock-card .sc-stock { margin: 10px 0 0 0; font-size: 3.2rem; color: #28a745; line-height: 1; }
 .stock-card .sc-stock small { font-size: 1.1rem; color: #fff; }
+/* ===== Carrinho (Fase 1C) ===== */
+.btn-add-cart { background-color: #28a745; color: #fff;
+  &:hover:not(:disabled) { background-color: #218838; } }
+.cart-fields { margin-top: 18px; display: flex; flex-direction: column; gap: 14px; }
+.cart-total { display: flex; justify-content: space-between; align-items: center; margin: 18px 0; padding-top: 14px; border-top: 2px solid #f1f1f1; font-size: 1.1rem; }
+.cart-total strong { font-size: 1.5rem; color: #313F2E; }
+.premium-table small { color: #777; }
