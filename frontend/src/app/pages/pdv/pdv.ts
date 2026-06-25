@@ -5,11 +5,12 @@ import { finalize } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import { NotificationService } from '../../services/notification.service';
 import { HardwareService } from '../../services/hardware.service';
+import { TrocasComponent } from '../../components/trocas/trocas';
 
 @Component({
   selector: 'app-pdv',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TrocasComponent],
   templateUrl: './pdv.html',
   styleUrl: './pdv.scss'
 })

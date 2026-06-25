@@ -10,6 +10,7 @@ const dashboardRoutes = require('./routes/dashboard.routes');
 const hardwareRoutes = require('./routes/hardware.routes');
 const userRoutes = require('./routes/users.routes');
 const reportRoutes = require('./routes/reports.routes');
+const exchangeRoutes = require('./routes/exchanges.routes');
 
 // 1. Inicializa o aplicativo Express
 const app = express();
@@ -33,6 +34,7 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/exchanges', exchangeRoutes);
 
 // 4. Health check
 app.get('/', (req, res) => {
