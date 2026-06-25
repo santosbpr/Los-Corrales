@@ -28,6 +28,7 @@ export class PdvComponent implements OnInit {
   cart: any[] = [];
   selectedCustomerId: any = null;
   paymentMethod = 'DINHEIRO';
+  discount = 0;
 
   scannedCode = '';
   isProcessing = false;
@@ -64,8 +65,13 @@ export class PdvComponent implements OnInit {
     this.quantity = 1;
   }
 
-  get total(): number {
+  get subtotal(): number {
     return this.cart.reduce((s, i) => s + i.unit_price * i.quantity, 0);
+  }
+
+  get total(): number {
+    const desc = Number(this.discount) || 0;
+    return Math.max(0, this.subtotal - desc);
   }
 
   private addVariantToCart(product: any, variantIndex: number, qty: number) {
@@ -129,6 +135,7 @@ export class PdvComponent implements OnInit {
     const payload = {
       customer_id: this.selectedCustomerId || null,
       payment_method: this.paymentMethod,
+      discount: Number(this.discount) || 0,
       items: this.cart.map(i => ({ product_id: i.product_id, variant_id: i.variant_id, quantity: i.quantity }))
     };
 
@@ -141,6 +148,7 @@ export class PdvComponent implements OnInit {
           this.cart = [];
           this.selectedCustomerId = null;
           this.paymentMethod = 'DINHEIRO';
+          this.discount = 0;
           this.loadProducts();
         },
         error: (err) => this.notification.error(err.error?.message || 'Erro ao finalizar a venda.')

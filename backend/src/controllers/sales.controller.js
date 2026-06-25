@@ -5,7 +5,7 @@ const SalesController = {
   // Venda do carrinho: chama a função atômica no Postgres.
   async createSale(req, res) {
     try {
-      const { customer_id = null, payment_method = 'DINHEIRO', items = [] } = req.body;
+      const { customer_id = null, payment_method = 'DINHEIRO', items = [], discount = 0 } = req.body;
 
       if (!Array.isArray(items) || items.length === 0) {
         return res.status(400).json({ message: 'A venda não possui itens.' });
@@ -24,7 +24,8 @@ const SalesController = {
         p_customer_id: customer_id,
         p_operator: operator,
         p_payment: payment_method,
-        p_items
+        p_items,
+        p_discount: Number(discount) || 0
       });
 
       if (error) {
