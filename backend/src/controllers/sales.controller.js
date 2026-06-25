@@ -42,6 +42,23 @@ const SalesController = {
       console.error('Erro ao criar venda:', err);
       return res.status(500).json({ message: 'Erro interno ao registrar a venda.' });
     }
+  },
+
+  // Lista as compras de um cliente (com itens) — base para a troca por NF.
+  async getCustomerSales(req, res) {
+    try {
+      const { customerId } = req.params;
+      const { data, error } = await supabase
+        .from('sales')
+        .select('id, created_at, total, payment_method, status, sale_items(product_id, variant_id, product_name, variant_info, quantity, unit_price)')
+        .eq('customer_id', customerId)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return res.status(200).json(data || []);
+    } catch (err) {
+      console.error('Erro ao listar compras do cliente:', err);
+      return res.status(500).json({ message: 'Erro ao buscar as compras do cliente.' });
+    }
   }
 };
 
