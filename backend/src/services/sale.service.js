@@ -1,4 +1,5 @@
 const supabase = require('../config/supabase');
+const AuditService = require('../services/audit.service');
 
 /**
  * Grava uma venda completa: cabeçalho (sales) + linhas (sale_items) e lança o total
@@ -56,6 +57,13 @@ async function recordSale({ customer_id = null, operator_email = null, payment_m
     }]);
     if (finErr) console.error('Aviso: venda gravada, mas erro ao lançar no financeiro:', finErr);
   }
+
+  // Auditoria: registra a venda (alimenta o relatório de usuários)
+  await AuditService.log(
+    operator_email,
+    'VENDA',
+    `Venda #${sale.id} • ${cleanItems.length} item(ns) • total ${total} • ${payment_method}`
+  );
 
   return { saleId: sale.id, total };
 }

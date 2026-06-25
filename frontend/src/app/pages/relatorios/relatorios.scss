@@ -1,0 +1,41 @@
+:host { display: block; }
+
+.page { padding: 30px; font-family: 'Inter', 'Segoe UI', sans-serif; background-color: #f8f9fa; min-height: 100vh; }
+.page-title { font-size: 1.6rem; font-weight: 700; color: #1a1a1a; margin: 0 0 5px 0; }
+.page-subtitle { color: #666; font-size: 0.9rem; margin: 0 0 30px 0; }
+.divider { border: 0; border-top: 1px solid #ddd; margin-bottom: 30px; }
+
+.card { background: #fff; border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 30px; }
+.card-title { margin: 0 0 16px 0; font-size: 1rem; color: #333; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+
+/* filtro de período */
+.filtros { display: flex; gap: 15px; align-items: flex-end; flex-wrap: wrap; }
+.filtros .grupo { display: flex; flex-direction: column; }
+.filtros label { font-size: 0.72rem; font-weight: 700; color: #555; text-transform: uppercase; margin-bottom: 6px; }
+.filtros input, .filtros select { padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; outline: none; background: #fff; &:focus { border-color: #8B4513; box-shadow: 0 0 0 3px rgba(139,69,19,0.1); } }
+.btn { border: none; border-radius: 8px; padding: 11px 22px; font-size: 0.9rem; font-weight: 600; cursor: pointer; background: #8B4513; color: #fff; transition: all .2s; &:hover:not(:disabled){ background:#6b340e; } &:disabled{ opacity:.6; cursor:not-allowed; } }
+.btn-pdf { background: #313F2E; &:hover:not(:disabled){ background:#24301f; } }
+
+/* mini-cards de indicadores */
+.kpis { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.kpi { flex: 1; min-width: 160px; background: #faf7f4; border: 1px solid #efe7df; border-radius: 10px; padding: 14px 16px; }
+.kpi .label { font-size: 0.72rem; text-transform: uppercase; color: #777; letter-spacing: .5px; font-weight: 600; }
+.kpi .valor { font-size: 1.5rem; font-weight: 700; margin-top: 6px; }
+.kpi.in .valor { color: #28a745; }
+.kpi.out .valor { color: #dc3545; }
+.kpi.neutro .valor { color: #1a1a1a; }
+.kpi.saldo.pos .valor { color: #28a745; }
+.kpi.saldo.neg .valor { color: #dc3545; }
+
+/* tabelas */
+.table-wrapper { border-radius: 10px; overflow: hidden; overflow-x: auto; border: 1px solid #f0ede9; }
+.premium-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;
+  thead th { background: #313F2E; color: #fff; padding: 12px 14px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: .5px; }
+  tbody td { padding: 11px 14px; border-bottom: 1px solid #f1f1f1; color: #333; }
+  tbody tr:hover { background: #fdfaf7; }
+  .text-right { text-align: right; }
+  .empty-row { text-align: center; color: #999; padding: 18px; }
+}
+.nota { font-size: 0.78rem; color: #8a6d3b; background: #fcf6e6; border: 1px solid #f3e6bf; border-radius: 8px; padding: 8px 12px; margin-top: 12px; }
+.subtitulo { font-size: 0.8rem; font-weight: 700; color: #555; margin: 18px 0 8px 0; text-transform: uppercase; letter-spacing: .3px; }
+.loading { color: #666; font-style: italic; padding: 10px 0; }

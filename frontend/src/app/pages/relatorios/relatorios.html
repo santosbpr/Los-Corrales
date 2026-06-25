@@ -1,0 +1,157 @@
+<div class="page">
+
+  <h2 class="page-title">📊 Relatórios</h2>
+  <p class="page-subtitle">Visão financeira, de estoque e de atividade dos usuários da Los Corrales.</p>
+  <hr class="divider">
+
+  <!-- Filtro de período -->
+  <div class="card">
+    <div class="filtros">
+      <div class="grupo">
+        <label>De</label>
+        <input type="date" [(ngModel)]="start">
+      </div>
+      <div class="grupo">
+        <label>Até</label>
+        <input type="date" [(ngModel)]="end">
+      </div>
+      <button class="btn" (click)="gerar()" [disabled]="loading">
+        {{ loading ? 'Gerando...' : 'Gerar relatórios' }}
+      </button>
+
+      <div class="grupo">
+        <label>Exportar PDF</label>
+        <select [(ngModel)]="tipoPdf">
+          <option value="geral">Geral (resumo)</option>
+          <option value="detalhado">Detalhado (completo)</option>
+          <option value="financeiro">Somente Financeiro (Caixa)</option>
+          <option value="estoque">Somente Estoque</option>
+          <option value="usuarios">Somente Usuários</option>
+        </select>
+      </div>
+      <button class="btn btn-pdf" (click)="baixarPdf()" [disabled]="loading">📄 Baixar PDF</button>
+    </div>
+    <p *ngIf="loading" class="loading">Carregando dados do período...</p>
+  </div>
+
+  <!-- FINANCEIRO -->
+  <div class="card" *ngIf="financial">
+    <h3 class="card-title">💰 Relatório Financeiro</h3>
+    <div class="kpis">
+      <div class="kpi in">
+        <div class="label">Entradas ({{ financial.entradas.count }})</div>
+        <div class="valor">{{ financial.entradas.total | currency:'BRL':'symbol':'1.2-2' }}</div>
+      </div>
+      <div class="kpi out">
+        <div class="label">Saídas ({{ financial.saidas.count }})</div>
+        <div class="valor">{{ financial.saidas.total | currency:'BRL':'symbol':'1.2-2' }}</div>
+      </div>
+      <div class="kpi neutro">
+        <div class="label">Trocas ({{ financial.trocas.count }})</div>
+        <div class="valor">{{ financial.trocas.total | currency:'BRL':'symbol':'1.2-2' }}</div>
+      </div>
+      <div class="kpi saldo" [class.pos]="financial.saldo >= 0" [class.neg]="financial.saldo < 0">
+        <div class="label">Saldo</div>
+        <div class="valor">{{ financial.saldo | currency:'BRL':'symbol':'1.2-2' }}</div>
+      </div>
+    </div>
+    <p class="nota">⚠️ {{ financial.observacao }}</p>
+  </div>
+
+  <!-- ESTOQUE -->
+  <div class="card" *ngIf="inventory">
+    <h3 class="card-title">📦 Relatório de Estoque</h3>
+    <div class="kpis">
+      <div class="kpi neutro">
+        <div class="label">Quantidade parada (em estoque)</div>
+        <div class="valor">{{ inventory.totalEmEstoque }} un.</div>
+      </div>
+      <div class="kpi in">
+        <div class="label">Quantidade movimentada (período)</div>
+        <div class="valor">{{ inventory.totalMovimentado }} un.</div>
+      </div>
+    </div>
+
+    <div class="subtitulo">Mais movimentados no período</div>
+    <div class="table-wrapper">
+      <table class="premium-table">
+        <thead><tr><th>Produto</th><th class="text-right">Qtd. vendida</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let p of inventory.topMovimentados">
+            <td>{{ p.produto }}</td>
+            <td class="text-right">{{ p.quantidade }}</td>
+          </tr>
+          <tr *ngIf="inventory.topMovimentados.length === 0">
+            <td colspan="2" class="empty-row">Nenhuma movimentação no período.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subtitulo">Itens parados (com estoque e sem giro no período)</div>
+    <div class="table-wrapper">
+      <table class="premium-table">
+        <thead><tr><th>Produto</th><th>Cor</th><th>Tamanho</th><th class="text-right">Estoque</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let i of inventory.semGiro">
+            <td>{{ i.produto }}</td>
+            <td>{{ i.cor }}</td>
+            <td>{{ i.tamanho }}</td>
+            <td class="text-right">{{ i.estoque }}</td>
+          </tr>
+          <tr *ngIf="inventory.semGiro.length === 0">
+            <td colspan="4" class="empty-row">Sem itens parados — tudo girou no período. 🎉</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- USUÁRIOS -->
+  <div class="card" *ngIf="users">
+    <h3 class="card-title">👤 Relatório de Usuários</h3>
+    <div class="kpis">
+      <div class="kpi neutro">
+        <div class="label">Total de ações no período</div>
+        <div class="valor">{{ users.totalAcoes }}</div>
+      </div>
+      <div class="kpi neutro">
+        <div class="label">Usuário mais ativo</div>
+        <div class="valor" style="font-size: 1rem;">{{ users.maisAtivos[0]?.usuario || '—' }}</div>
+      </div>
+    </div>
+
+    <div class="subtitulo">Usuários mais ativos</div>
+    <div class="table-wrapper">
+      <table class="premium-table">
+        <thead><tr><th>Usuário</th><th class="text-right">Ações</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let u of users.maisAtivos">
+            <td>{{ u.usuario }}</td>
+            <td class="text-right">{{ u.acoes }}</td>
+          </tr>
+          <tr *ngIf="users.maisAtivos.length === 0">
+            <td colspan="2" class="empty-row">Nenhuma atividade registrada no período.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="subtitulo">Funções mais realizadas</div>
+    <div class="table-wrapper">
+      <table class="premium-table">
+        <thead><tr><th>Função / Ação</th><th class="text-right">Vezes</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let f of users.funcoesMaisRealizadas">
+            <td>{{ f.acao }}</td>
+            <td class="text-right">{{ f.total }}</td>
+          </tr>
+          <tr *ngIf="users.funcoesMaisRealizadas.length === 0">
+            <td colspan="2" class="empty-row">Nenhuma função registrada no período.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
