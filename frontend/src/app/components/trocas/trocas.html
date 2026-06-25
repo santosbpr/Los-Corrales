@@ -17,31 +17,37 @@
     </div>
   </div>
 
-  <!-- Item devolvido -->
+  <!-- Cliente + NF (troca vinculada à venda de origem) -->
   <div class="row">
     <div class="grupo">
-      <label>Buscar item devolvido por referência (SKU)</label>
-      <div class="busca">
-        <input type="text" [(ngModel)]="refDevolvido"
-               (keyup.enter)="buscarPorReferencia(refDevolvido, 'devolvido')"
-               placeholder="Ex: CAM-0001-PRETO-M">
-        <button type="button" class="btn-buscar" (click)="buscarPorReferencia(refDevolvido, 'devolvido')">🔍 Buscar</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="row">
-    <div class="grupo">
-      <label>Item devolvido</label>
-      <select [(ngModel)]="devolvidoProduto">
-        <option [ngValue]="null" disabled selected>Escolha o produto devolvido...</option>
-        <option *ngFor="let p of products" [ngValue]="p">{{ p.name }} ({{ p.category }})</option>
+      <label>Cliente (para troca por NF)</label>
+      <select [(ngModel)]="selectedCustomerId" (change)="onClienteChange()">
+        <option [ngValue]="null">Sem cliente / devolução avulsa</option>
+        <option *ngFor="let c of customers" [ngValue]="c.id">{{ c.name }}</option>
       </select>
     </div>
-    <div class="grupo" *ngIf="devolvidoProduto">
-      <label>Variação</label>
-      <select [(ngModel)]="devolvidoVarIndex">
-        <option *ngFor="let v of devolvidoProduto.variants; let i = index" [ngValue]="i">Cor: {{ v.color }} | Tam: {{ v.size }}</option>
+    <div class="grupo" *ngIf="vendasCliente.length > 0">
+      <label>Compra de origem (NF)</label>
+      <select [(ngModel)]="selectedSaleId" (change)="onVendaChange()">
+        <option [ngValue]="null">Selecione a compra...</option>
+        <option *ngFor="let v of vendasCliente" [ngValue]="v.id">
+          Venda #{{ v.id }} — {{ v.created_at | date:'dd/MM/yyyy' }} — {{ v.total | currency:'BRL':'symbol':'1.2-2' }}
+        </option>
+      </select>
+    </div>
+  </div>
+  <p class="nf-hint" *ngIf="selectedCustomerId && vendasCliente.length === 0">
+    Este cliente não possui compras registradas — siga como devolução avulsa abaixo.
+  </p>
+
+  <!-- Item devolvido: a partir da NF escolhida -->
+  <div class="row" *ngIf="selectedSaleId && itensDaVenda.length > 0">
+    <div class="grupo">
+      <label>Item devolvido (da Venda #{{ selectedSaleId }})</label>
+      <select [(ngModel)]="devolvidoItemIndex">
+        <option *ngFor="let it of itensDaVenda; let i = index" [ngValue]="i">
+          {{ it.product_name }} — {{ it.variant_info }} (comprou {{ it.quantity }})
+        </option>
       </select>
     </div>
     <div class="grupo small">
@@ -49,6 +55,41 @@
       <input type="number" min="1" [(ngModel)]="devolvidoQtd">
     </div>
   </div>
+
+  <!-- Item devolvido: modo livre (devolução avulsa, sem NF) -->
+  <ng-container *ngIf="!(selectedSaleId && itensDaVenda.length > 0)">
+    <div class="row">
+      <div class="grupo">
+        <label>Buscar item devolvido por referência (SKU)</label>
+        <div class="busca">
+          <input type="text" [(ngModel)]="refDevolvido"
+                 (keyup.enter)="buscarPorReferencia(refDevolvido, 'devolvido')"
+                 placeholder="Ex: CAM-0001-PRETO-M">
+          <button type="button" class="btn-buscar" (click)="buscarPorReferencia(refDevolvido, 'devolvido')">🔍 Buscar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="grupo">
+        <label>Item devolvido</label>
+        <select [(ngModel)]="devolvidoProduto">
+          <option [ngValue]="null" disabled selected>Escolha o produto devolvido...</option>
+          <option *ngFor="let p of products" [ngValue]="p">{{ p.name }} ({{ p.category }})</option>
+        </select>
+      </div>
+      <div class="grupo" *ngIf="devolvidoProduto">
+        <label>Variação</label>
+        <select [(ngModel)]="devolvidoVarIndex">
+          <option *ngFor="let v of devolvidoProduto.variants; let i = index" [ngValue]="i">Cor: {{ v.color }} | Tam: {{ v.size }}</option>
+        </select>
+      </div>
+      <div class="grupo small">
+        <label>Qtd</label>
+        <input type="number" min="1" [(ngModel)]="devolvidoQtd">
+      </div>
+    </div>
+  </ng-container>
 
   <label class="check">
     <input type="checkbox" [(ngModel)]="temItemNovo"> Trocar por outro item (desmarcado = devolução pura)

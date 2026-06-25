@@ -26,7 +26,7 @@ const ExchangeController = {
   // Solicitar troca (PDV) — nasce PENDENTE, sem efeito em estoque/financeiro.
   async create(req, res) {
     try {
-      const { customer_id = null, reason = '', returned, delivered = null } = req.body;
+      const { customer_id = null, sale_id = null, reason = '', returned, delivered = null } = req.body;
 
       if (!returned || !returned.product_id || !returned.variant_id) {
         return res.status(400).json({ message: 'Informe o item devolvido (produto e variação).' });
@@ -40,6 +40,7 @@ const ExchangeController = {
 
       const { data, error } = await supabase.from('exchanges').insert([{
         customer_id,
+        sale_id,
         requested_by: req.currentUserEmail || req.headers['user-email'] || null,
         status: 'PENDENTE',
         reason,

@@ -13,4 +13,8 @@ export class SalesService {
   createSale(payload: any): Observable<any> {
     return this.http.post(this.apiUrl, payload);
   }
+
+  getCustomerSales(customerId: number | string): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/customer/${customerId}`);
+  }
 }

@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ExchangeService } from '../../services/exchange.service';
 import { ProductService } from '../../services/product.service';
+import { CustomerService } from '../../services/customer.service';
+import { SalesService } from '../../services/sales.service';
 import { NotificationService } from '../../services/notification.service';
 import { AuthService } from '../../services/auth.service';
 
@@ -20,6 +22,14 @@ export class TrocasComponent implements OnInit {
 
   isAdmin = false;
   pendentes: any[] = [];
+
+  // Vínculo com NF (venda de origem)
+  customers: any[] = [];
+  selectedCustomerId: any = null;
+  vendasCliente: any[] = [];
+  selectedSaleId: any = null;
+  itensDaVenda: any[] = [];
+  devolvidoItemIndex = 0;
 
   // Formulário de solicitação
   devolvidoProduto: any = null;
@@ -47,6 +57,8 @@ export class TrocasComponent implements OnInit {
   constructor(
     private exchangeService: ExchangeService,
     private productService: ProductService,
+    private customerService: CustomerService,
+    private salesService: SalesService,
     private notification: NotificationService,
     private auth: AuthService,
     private cdr: ChangeDetectorRef
@@ -58,6 +70,7 @@ export class TrocasComponent implements OnInit {
     if (!this.products || this.products.length === 0) {
       this.carregarProdutos();
     }
+    this.carregarClientes();
     this.carregarPendentes();
   }
 
@@ -76,6 +89,51 @@ export class TrocasComponent implements OnInit {
       next: (data) => { this.pendentes = data; this.cdr.detectChanges(); },
       error: () => this.notification.error('Erro ao carregar trocas pendentes.')
     });
+  }
+
+  carregarClientes() {
+    this.customerService.getCustomers().subscribe({
+      next: (data: any) => { this.customers = data || []; this.cdr.detectChanges(); },
+      error: () => { /* opcional */ }
+    });
+  }
+
+  onClienteChange() {
+    this.selectedSaleId = null;
+    this.vendasCliente = [];
+    this.itensDaVenda = [];
+    this.devolvidoItemIndex = 0;
+    if (!this.selectedCustomerId) { this.cdr.detectChanges(); return; }
+
+    this.salesService.getCustomerSales(this.selectedCustomerId).subscribe({
+      next: (data: any[]) => { this.vendasCliente = data || []; this.cdr.detectChanges(); },
+      error: () => this.notification.error('Erro ao carregar as compras do cliente.')
+    });
+  }
+
+  onVendaChange() {
+    const venda = this.vendasCliente.find(v => v.id === this.selectedSaleId);
+    this.itensDaVenda = venda?.sale_items || [];
+    this.devolvidoItemIndex = 0;
+    this.cdr.detectChanges();
+  }
+
+  // Decide a origem do item devolvido: item da NF (se uma venda foi escolhida) ou livre.
+  private getReturnedPayload() {
+    if (this.selectedSaleId && this.itensDaVenda.length > 0) {
+      const it = this.itensDaVenda[this.devolvidoItemIndex];
+      if (!it) return null;
+      return {
+        product_id: it.product_id,
+        variant_id: it.variant_id,
+        name: it.product_name,
+        info: it.variant_info,
+        qty: Number(this.devolvidoQtd) || 1,
+        unit_price: Number(it.unit_price) || 0
+      };
+    }
+    if (!this.devolvidoProduto) return null;
+    return this.montarItem(this.devolvidoProduto, this.devolvidoVarIndex, this.devolvidoQtd);
   }
 
   // Captura do leitor IoT: usa o código lido como referência e preenche o item-alvo.
@@ -135,7 +193,9 @@ export class TrocasComponent implements OnInit {
 
   solicitar() {
     if (this.isSaving) return;
-    if (!this.devolvidoProduto) {
+
+    const returned = this.getReturnedPayload();
+    if (!returned) {
       this.notification.error('Selecione o item que está sendo devolvido.');
       return;
     }
@@ -145,8 +205,10 @@ export class TrocasComponent implements OnInit {
     }
 
     const payload = {
+      customer_id: this.selectedCustomerId || null,
+      sale_id: this.selectedSaleId || null,
       reason: this.motivo,
-      returned: this.montarItem(this.devolvidoProduto, this.devolvidoVarIndex, this.devolvidoQtd),
+      returned,
       delivered: this.temItemNovo ? this.montarItem(this.novoProduto, this.novoVarIndex, this.novoQtd) : null
     };
 
@@ -159,6 +221,7 @@ export class TrocasComponent implements OnInit {
           this.devolvidoProduto = null; this.devolvidoVarIndex = 0; this.devolvidoQtd = 1;
           this.temItemNovo = false; this.novoProduto = null; this.novoVarIndex = 0; this.novoQtd = 1;
           this.motivo = '';
+          this.selectedCustomerId = null; this.selectedSaleId = null; this.vendasCliente = []; this.itensDaVenda = []; this.devolvidoItemIndex = 0;
           this.carregarPendentes();
         },
         error: (err) => this.notification.error(err.error?.message || 'Erro ao registrar a troca.')
