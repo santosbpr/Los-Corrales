@@ -1,5 +1,5 @@
 <div class="product-list-container">
-  
+
   <div class="header-section">
     <h1 class="page-title">Inventário Los Corrales</h1>
     <div class="actions-header">
@@ -19,38 +19,55 @@
           <th>Ref. (SKU)</th>
           <th>Nome do Produto</th>
           <th class="text-center">Preço</th>
-          <th class="text-center">Qtd. Estoque</th> 
+          <th class="text-center">Estoque (variações)</th>
           <th class="text-right">Ações</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let product of filteredProducts">
-          
-          <td class="product-ref">
-            <strong>{{ product.sku || product.reference || 'S/ REF' }}</strong>
-          </td>
-          
-          <td class="product-name">
-            <strong>{{ product.name }}</strong>
-            <span class="product-category">{{ product.category }}</span>
-          </td>
-          
-          <td class="text-center product-price">{{ product.price | currency:'BRL' }}</td>
-          
-          <td class="text-center qty-column">
-            <strong>{{ product.quantity || product.stock || (product.variants && product.variants[0]?.stock) || '0' }}</strong>
-            <span class="qty-unit">unids.</span>
-          </td>
+        <ng-container *ngFor="let product of filteredProducts">
+          <tr>
+            <td class="product-ref">
+              <strong>{{ product.sku || product.reference || 'S/ REF' }}</strong>
+            </td>
 
-          <td class="text-right action-col">
-            <button class="btn-action btn-edit" (click)="editProduct(product)">
-              Editar
-            </button>
-            <button class="btn-action btn-delete" (click)="deleteProduct(product.id, product.name)">
-              Excluir
-            </button>
-          </td>
-        </tr>
+            <td class="product-name">
+              <strong>{{ product.name }}</strong>
+              <span class="product-category">{{ product.category }}</span>
+            </td>
+
+            <td class="text-center product-price">{{ product.price | currency:'BRL':'symbol':'1.2-2' }}</td>
+
+            <td class="text-center qty-column">
+              <button class="qty-toggle" (click)="toggleExpand(product.id)"
+                      *ngIf="product.variants && product.variants.length">
+                <strong>{{ totalStock(product) }}</strong> <span class="qty-unit">unids.</span>
+                <span class="caret">{{ expandedId === product.id ? '▾' : '▸' }} {{ product.variants.length }} var.</span>
+              </button>
+              <span *ngIf="!product.variants || !product.variants.length">
+                <strong>{{ totalStock(product) }}</strong> <span class="qty-unit">unids.</span>
+              </span>
+            </td>
+
+            <td class="text-right action-col">
+              <button class="btn-action btn-edit" (click)="editProduct(product)">Editar</button>
+              <button class="btn-action btn-delete" (click)="deleteProduct(product.id, product.name)">Excluir</button>
+            </td>
+          </tr>
+
+          <!-- Linha expandida: variações -->
+          <tr class="variants-row" *ngIf="expandedId === product.id">
+            <td [attr.colspan]="5">
+              <div class="variants-grid">
+                <div class="variant-chip" *ngFor="let v of product.variants">
+                  <span class="v-ref">REF {{ v.sku || 'S/REF' }}</span>
+                  <span class="v-attr">Cor: {{ v.color }}</span>
+                  <span class="v-attr">Tam: {{ v.size }}</span>
+                  <span class="v-stock" [class.low]="(v.stock || 0) <= 0">{{ v.stock || 0 }} un.</span>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
       </tbody>
     </table>
   </div>

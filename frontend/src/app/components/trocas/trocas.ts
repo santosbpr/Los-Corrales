@@ -111,6 +111,15 @@ export class TrocasComponent implements OnInit {
     });
   }
 
+  diasDaVenda(v: any): number {
+    if (!v?.created_at) return 0;
+    return Math.floor((Date.now() - new Date(v.created_at).getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  trocaExpirada(v: any): boolean {
+    return this.diasDaVenda(v) > 30;
+  }
+
   onVendaChange() {
     const venda = this.vendasCliente.find(v => v.id === this.selectedSaleId);
     this.itensDaVenda = venda?.sale_items || [];

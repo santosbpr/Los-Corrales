@@ -17,6 +17,7 @@ export class ProductListComponent implements OnInit {
   isModalOpen = false //Varial que controla a janela modal de cadastro
   productToEdit: any = null; //Guarda o produto selecionado para edição
   searchTerm: string = ''; // Variável para armazenar o termo de busca
+  expandedId: any = null;   // produto com variações expandidas
 
   constructor(
     private productService: ProductService,
@@ -26,12 +27,27 @@ export class ProductListComponent implements OnInit {
 
   // Função para filtrar os produtos com base no termo de busca
   get filteredProducts() {
-    if (!this.searchTerm) {
-      return this.products; // Se não houver termo de busca, retorna todos os produtos
-    }
+    const termo = this.searchTerm.toLowerCase().trim();
+    if (!termo) return this.products;
     return this.products.filter(product =>
-      product.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+      (product.name || '').toLowerCase().includes(termo) ||
+      (product.sku || '').toLowerCase().includes(termo) ||
+      (Array.isArray(product.variants) &&
+        product.variants.some((v: any) => (v.sku || '').toLowerCase().includes(termo)))
     );
+  }
+
+  // Soma o estoque de todas as variações
+  totalStock(product: any): number {
+    if (Array.isArray(product.variants)) {
+      return product.variants.reduce((s: number, v: any) => s + (Number(v.stock) || 0), 0);
+    }
+    return Number(product.quantity || product.stock || 0);
+  }
+
+  // Expande/colapsa as variações de um produto
+  toggleExpand(id: any) {
+    this.expandedId = this.expandedId === id ? null : id;
   } 
   
   // Função para abror o modal de NOVo produto

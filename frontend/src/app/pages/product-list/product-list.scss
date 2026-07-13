@@ -239,3 +239,14 @@
   /* Permite rolar a tabela para os lados se a tela for pequena */
   overflow-x: auto; 
 }
+/* ===== Variações no estoque (#9) ===== */
+.qty-toggle { background: none; border: none; cursor: pointer; font-size: inherit; color: inherit; display: inline-flex; align-items: center; gap: 8px; }
+.qty-toggle .caret { font-size: 0.72rem; color: #8B4513; font-weight: 600; }
+.qty-toggle:hover .caret { text-decoration: underline; }
+.variants-row td { background: #faf7f4; padding: 12px 16px; }
+.variants-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.variant-chip { display: inline-flex; align-items: center; gap: 10px; background: #fff; border: 1px solid #efe7df; border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; }
+.variant-chip .v-ref { font-weight: 700; color: #313F2E; }
+.variant-chip .v-attr { color: #555; }
+.variant-chip .v-stock { font-weight: 700; color: #28a745; }
+.variant-chip .v-stock.low { color: #dc3545; }

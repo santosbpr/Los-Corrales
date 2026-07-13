@@ -32,6 +32,21 @@ const ExchangeController = {
         return res.status(400).json({ message: 'Informe o item devolvido (produto e variação).' });
       }
 
+      // Regra dos 30 dias: troca vinculada a uma NF só é permitida em até 30 dias da compra.
+      const LIMITE_DIAS_TROCA = 30;
+      if (sale_id) {
+        const { data: venda } = await supabase
+          .from('sales').select('created_at').eq('id', sale_id).single();
+        if (venda?.created_at) {
+          const dias = Math.floor((Date.now() - new Date(venda.created_at).getTime()) / (1000 * 60 * 60 * 24));
+          if (dias > LIMITE_DIAS_TROCA) {
+            return res.status(400).json({
+              message: `Prazo de troca expirado: a compra foi há ${dias} dias (limite de ${LIMITE_DIAS_TROCA} dias).`
+            });
+          }
+        }
+      }
+
       const rQty = Number(returned.qty) || 1;
       const rPrice = Number(returned.unit_price) || 0;
       const dQty = delivered ? (Number(delivered.qty) || 1) : 0;

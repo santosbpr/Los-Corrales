@@ -118,11 +118,11 @@
         @if (userRole === 'CAIXA' || userRole === 'ADMIN') {
         <a routerLink="/products" routerLinkActive="active-link" class="menu-link">📦 Estoque</a>
         <a routerLink="/pdv" routerLinkActive="active-link" class="menu-link">🛒 Frente de Caixa (PDV)</a>
+        <a routerLink="/crm" routerLinkActive="active-link" class="menu-link">👥 CRM (Clientes)</a>
         }
         
         @if (userRole === 'ADMIN') {
           <a routerLink="/dashboard" routerLinkActive="active-link" class="menu-link">📊 Dashboard</a>
-          <a routerLink="/crm" routerLinkActive="active-link" class="menu-link">👥 CRM (Clientes)</a>
           <a routerLink="/finance" routerLinkActive="active-link" class="menu-link">💰 Financeiro (Caixa)</a>
           <a routerLink="/relatorios" routerLinkActive="active-link" class="menu-link">📋 Relatórios</a>
           <a routerLink="/profile" routerLinkActive="active-link" class="menu-link">⚙️ Configurações (Perfil)</a>

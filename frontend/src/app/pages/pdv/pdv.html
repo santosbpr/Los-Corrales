@@ -30,7 +30,7 @@
           <label class="form-label">Variação</label>
           <select class="form-select" [(ngModel)]="selectedVariantIndex">
             <option *ngFor="let v of selectedProduct.variants; let i = index" [ngValue]="i">
-              Cor: {{ v.color }} | Tam: {{ v.size }} — {{ v.stock }} un.
+              REF {{ v.sku || 'S/REF' }} — Cor: {{ v.color }} | Tam: {{ v.size }} — {{ v.stock }} un.
             </option>
           </select>
         </div>
@@ -57,7 +57,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let i of cart; let idx = index">
-              <td><strong>{{ i.product_name }}</strong><br><small>{{ i.variant_info }}</small></td>
+              <td><strong>{{ i.product_name }}</strong><br><small>{{ i.variant_info }}<span *ngIf="i.sku"> · REF {{ i.sku }}</span></small></td>
               <td class="text-center">{{ i.quantity }}</td>
               <td class="text-right">{{ (i.unit_price * i.quantity) | currency:'BRL':'symbol':'1.2-2' }}</td>
               <td class="text-right"><button class="btn-icon" (click)="removerItem(idx)" title="Remover">🗑️</button></td>
