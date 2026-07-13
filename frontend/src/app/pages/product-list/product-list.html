@@ -6,7 +6,7 @@
       <div class="search-box">
         <span>🔍</span> <input type="text" placeholder="Pesquisar por nome ou referência..." [(ngModel)]="searchTerm">
       </div>
-      <button class="btn-new-product" (click)="openNewProductModal()">
+      <button *ngIf="isAdmin" class="btn-new-product" (click)="openNewProductModal()">
         + Novo Item
       </button>
     </div>
@@ -49,8 +49,11 @@
             </td>
 
             <td class="text-right action-col">
-              <button class="btn-action btn-edit" (click)="editProduct(product)">Editar</button>
-              <button class="btn-action btn-delete" (click)="deleteProduct(product.id, product.name)">Excluir</button>
+              <ng-container *ngIf="isAdmin; else somenteLeitura">
+                <button class="btn-action btn-edit" (click)="editProduct(product)">Editar</button>
+                <button class="btn-action btn-delete" (click)="deleteProduct(product.id, product.name)">Excluir</button>
+              </ng-container>
+              <ng-template #somenteLeitura><span class="ro-tag">somente leitura</span></ng-template>
             </td>
           </tr>
 

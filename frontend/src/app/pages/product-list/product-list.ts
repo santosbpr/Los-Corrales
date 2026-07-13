@@ -4,6 +4,7 @@ import { ProductService } from '../../services/product.service';
 import { ProductFormComponent } from '../product-form/product-form';
 import { FormsModule } from '@angular/forms';
 import { NotificationService } from '../../services/notification.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-product-list',
@@ -18,11 +19,13 @@ export class ProductListComponent implements OnInit {
   productToEdit: any = null; //Guarda o produto selecionado para edição
   searchTerm: string = ''; // Variável para armazenar o termo de busca
   expandedId: any = null;   // produto com variações expandidas
+  isAdmin = false;          // só ADMIN edita/cria/exclui
 
   constructor(
     private productService: ProductService,
     private cdRef: ChangeDetectorRef,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private auth: AuthService
     ) {}
 
   // Função para filtrar os produtos com base no termo de busca
@@ -84,6 +87,7 @@ export class ProductListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.isAdmin = this.auth.getRole() === 'ADMIN';
     // Carrega os produtos qnd inicializado
     this.loadData();
     

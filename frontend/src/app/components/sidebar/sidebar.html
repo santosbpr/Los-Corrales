@@ -1,37 +1,40 @@
-<div class="sidebar-container" style="background-color: #1a1a1a; min-height: 100vh; width: 250px; padding: 20px 10px; box-sizing: border-box;">
-  <h3 style="color: #fff; margin-left: 15px; margin-bottom: 30px; font-family: Arial, sans-serif;">Los Corrales</h3>
-  
-  <div style="display: flex; flex-direction: column; gap: 8px;">
-    
-    <a routerLink="/pdv" 
-       routerLinkActive="active-item" 
-       class="menu-link">
-       🛒 Frente de Caixa
+<div class="sidebar-container" style="background-color: #1a1a1a; min-height: 100vh; width: 250px; padding: 20px 10px; box-sizing: border-box; display: flex; flex-direction: column;">
+  <h3 style="color: #fff; margin-left: 15px; margin-bottom: 6px; font-family: Arial, sans-serif;">Los Corrales</h3>
+  <span style="color:#888; font-size:0.72rem; margin-left:15px; margin-bottom:24px; text-transform:uppercase;">{{ role }}</span>
+
+  <div style="display: flex; flex-direction: column; gap: 8px; flex: 1;">
+
+    <a *ngIf="can('ADMIN','CAIXA')" routerLink="/pdv" routerLinkActive="active-item" class="menu-link">
+      🛒 Frente de Caixa
     </a>
 
-    <a routerLink="/products" 
-       routerLinkActive="active-item" 
-       class="menu-link">
-       📦 Estoque de Produtos
+    <a *ngIf="can('ADMIN','CAIXA','ESTOQUISTA')" routerLink="/products" routerLinkActive="active-item" class="menu-link">
+      📦 Estoque de Produtos
     </a>
 
-    <a routerLink="/crm" 
-       routerLinkActive="active-item" 
-       class="menu-link">
-       👥 CRM (Clientes)
+    <a *ngIf="can('ADMIN','CAIXA')" routerLink="/crm" routerLinkActive="active-item" class="menu-link">
+      👥 CRM (Clientes)
     </a>
 
-    <a routerLink="/dashboard" 
-       routerLinkActive="active-item" 
-       class="menu-link">
-       📊 Dashboard
+    <a *ngIf="can('ADMIN','CAIXA','ESTOQUISTA')" routerLink="/relatorios" routerLinkActive="active-item" class="menu-link">
+      📊 Relatórios
     </a>
 
-    <a routerLink="/settings" 
-       routerLinkActive="active-item" 
-       class="menu-link">
-       ⚙️ Configurações
+    <a *ngIf="can('ADMIN')" routerLink="/dashboard" routerLinkActive="active-item" class="menu-link">
+      📈 Dashboard
+    </a>
+
+    <a *ngIf="can('ADMIN')" routerLink="/finance" routerLinkActive="active-item" class="menu-link">
+      💰 Finanças
+    </a>
+
+    <a *ngIf="can('ADMIN')" routerLink="/profile" routerLinkActive="active-item" class="menu-link">
+      ⚙️ Configurações
     </a>
 
   </div>
+
+  <button (click)="sair()" class="menu-link" style="background:none; border:none; text-align:left; cursor:pointer; color:#ff6b6b; margin-top:12px;">
+    🚪 Sair do Sistema
+  </button>
 </div>

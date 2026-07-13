@@ -6,6 +6,7 @@ import { finalize } from 'rxjs/operators';
 import { ReportService } from '../../services/report.service';
 import { NotificationService } from '../../services/notification.service';
 import { PdfReportService } from '../../services/pdf-report.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-relatorios',
@@ -20,6 +21,11 @@ export class RelatoriosComponent implements OnInit {
   loading = false;
   tipoPdf = 'geral';
 
+  role = '';
+  podeFinanceiro = false; // vendas/caixa
+  podeEstoque = false;
+  podeUsuarios = false;
+
   financial: any = null;
   inventory: any = null;
   users: any = null;
@@ -28,10 +34,21 @@ export class RelatoriosComponent implements OnInit {
     private reportService: ReportService,
     private notification: NotificationService,
     private pdf: PdfReportService,
+    private auth: AuthService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
+    this.role = this.auth.getRole();
+    this.podeFinanceiro = this.role === 'ADMIN' || this.role === 'CAIXA';
+    this.podeEstoque    = this.role === 'ADMIN' || this.role === 'ESTOQUISTA';
+    this.podeUsuarios   = this.role === 'ADMIN';
+
+    // Tipo de PDF inicial conforme o que o papel pode ver
+    this.tipoPdf = this.role === 'ADMIN' ? 'geral'
+                 : this.podeFinanceiro ? 'financeiro'
+                 : 'estoque';
+
     // Padrão: do primeiro dia do mês atual até hoje
     const hoje = new Date();
     const primeiro = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -44,17 +61,18 @@ export class RelatoriosComponent implements OnInit {
     if (this.loading) return;
     this.loading = true;
 
-    forkJoin({
-      financial: this.reportService.getFinancial(this.start, this.end),
-      inventory: this.reportService.getInventory(this.start, this.end),
-      users: this.reportService.getUsers(this.start, this.end)
-    }).pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
+    const calls: any = {};
+    if (this.podeFinanceiro) calls.financial = this.reportService.getFinancial(this.start, this.end);
+    if (this.podeEstoque)    calls.inventory = this.reportService.getInventory(this.start, this.end);
+    if (this.podeUsuarios)   calls.users = this.reportService.getUsers(this.start, this.end);
+
+    forkJoin(calls).pipe(finalize(() => { this.loading = false; this.cdr.detectChanges(); }))
       .subscribe({
-        next: (r) => {
-          this.financial = r.financial;
-          this.inventory = r.inventory;
-          this.users = r.users;
-          this.cdr.detectChanges(); // força a renderização assim que os dados chegam
+        next: (r: any) => {
+          if (r.financial) this.financial = r.financial;
+          if (r.inventory) this.inventory = r.inventory;
+          if (r.users) this.users = r.users;
+          this.cdr.detectChanges();
         },
         error: () => this.notification.error('Erro ao gerar os relatórios.')
       });
