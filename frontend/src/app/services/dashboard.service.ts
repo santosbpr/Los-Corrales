@@ -12,4 +12,8 @@ export class DashboardService {
   getSummary(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/summary`);
   }
+
+  getCharts(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/charts`);
+  }
 }

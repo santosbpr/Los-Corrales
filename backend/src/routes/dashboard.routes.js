@@ -5,5 +5,6 @@ const authorize = require('../middlewares/auth.middleware');
 
 // Rota GET /api/dashboard/summary
 router.get('/summary', authorize(['ADMIN']), DashboardController.getSummary);
+router.get('/charts', authorize(['ADMIN']), DashboardController.charts);
 
 module.exports = router;

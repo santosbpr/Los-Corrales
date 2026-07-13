@@ -14,6 +14,8 @@ export class DashboardComponent implements OnInit {
   totalItemsSold: number = 0;
   lowStockItems: any[] = [];
 
+  charts: any = null;
+
   constructor(
     private dashboardService: DashboardService,
     private cdr: ChangeDetectorRef
@@ -21,6 +23,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.loadDashboardData();
+    this.loadCharts();
   }
 
   loadDashboardData() {
@@ -29,13 +32,38 @@ export class DashboardComponent implements OnInit {
         this.totalRevenue = data.totalRevenue || 0;
         this.totalItemsSold = data.totalItemsSold || 0;
         this.lowStockItems = data.lowStockItems || [];
-        
-        // Manda o Angular redesenhar o ecrã com os novos números
         this.cdr.detectChanges();
       },
+      error: (err) => console.error('🚨 Erro ao carregar o dashboard:', err)
+    });
+  }
+
+  loadCharts() {
+    this.dashboardService.getCharts().subscribe({
+      next: (data) => { this.charts = data; this.cdr.detectChanges(); },
       error: (err) => {
-        console.error('🚨 Erro ao carregar o dashboard:', err);
+        console.error('🚨 Erro ao carregar gráficos:', err);
+        // Rede de segurança: mostra as pizzas zeradas em vez de sumir com tudo
+        this.charts = {
+          financeiro: { entradas: 0, saidas: 0 },
+          mercadoria: { movimentada: 0, parada: 0 },
+          tipoVenda: { presencial: 0, ecommerce: 0 }
+        };
+        this.cdr.detectChanges();
       }
     });
+  }
+
+  // Gera o conic-gradient da pizza (2 fatias). Se não há dados, cinza.
+  pieGradient(a: number, b: number, colorA: string, colorB: string): string {
+    const total = (Number(a) || 0) + (Number(b) || 0);
+    if (total <= 0) return 'conic-gradient(#e0e0e0 0 100%)';
+    const pct = (Number(a) / total) * 100;
+    return `conic-gradient(${colorA} 0 ${pct}%, ${colorB} ${pct}% 100%)`;
+  }
+
+  pct(a: number, b: number): number {
+    const total = (Number(a) || 0) + (Number(b) || 0);
+    return total > 0 ? Math.round((Number(a) / total) * 100) : 0;
   }
 }

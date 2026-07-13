@@ -17,6 +17,44 @@
     </div>
   </div>
 
+  <div class="charts-row" *ngIf="charts">
+    <!-- Financeiro -->
+    <div class="chart-card">
+      <h4 class="chart-title">💰 Financeiro (R$)</h4>
+      <div class="pie" [style.background]="pieGradient(charts.financeiro.entradas, charts.financeiro.saidas, '#28a745', '#dc3545')">
+        <span class="pie-center">{{ pct(charts.financeiro.entradas, charts.financeiro.saidas) }}%</span>
+      </div>
+      <div class="legend">
+        <span><i style="background:#28a745"></i> Entradas: {{ charts.financeiro.entradas | currency:'BRL':'symbol':'1.2-2' }}</span>
+        <span><i style="background:#dc3545"></i> Saídas: {{ charts.financeiro.saidas | currency:'BRL':'symbol':'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Mercadoria -->
+    <div class="chart-card">
+      <h4 class="chart-title">📦 Mercadoria (unidades)</h4>
+      <div class="pie" [style.background]="pieGradient(charts.mercadoria.movimentada, charts.mercadoria.parada, '#8B4513', '#d9a679')">
+        <span class="pie-center">{{ pct(charts.mercadoria.movimentada, charts.mercadoria.parada) }}%</span>
+      </div>
+      <div class="legend">
+        <span><i style="background:#8B4513"></i> Movimentada: {{ charts.mercadoria.movimentada }} un.</span>
+        <span><i style="background:#d9a679"></i> Parada: {{ charts.mercadoria.parada }} un.</span>
+      </div>
+    </div>
+
+    <!-- Tipo de venda -->
+    <div class="chart-card">
+      <h4 class="chart-title">🛍️ Tipo de venda</h4>
+      <div class="pie" [style.background]="pieGradient(charts.tipoVenda.presencial, charts.tipoVenda.ecommerce, '#313F2E', '#5b9bd5')">
+        <span class="pie-center">{{ pct(charts.tipoVenda.presencial, charts.tipoVenda.ecommerce) }}%</span>
+      </div>
+      <div class="legend">
+        <span><i style="background:#313F2E"></i> Presencial: {{ charts.tipoVenda.presencial }}</span>
+        <span><i style="background:#5b9bd5"></i> E-commerce: {{ charts.tipoVenda.ecommerce }}</span>
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <h3 class="alert-title">⚠️ Alerta de Estoque Baixo</h3>
     <p class="alert-sub">Peças com menos de 3 unidades disponíveis na loja.</p>
