@@ -14,33 +14,50 @@
 
   <div class="pdv-columns">
 
-    <!-- Adicionar item -->
+    <!-- Adicionar item (seleção em cascata: produto -> cor -> tamanho) -->
     <div class="pdv-col card">
       <h3 class="card-title">Adicionar item</h3>
       <div class="form-vertical">
+
         <div class="form-group">
           <label class="form-label">Produto</label>
           <select class="form-select" [(ngModel)]="selectedProduct" (change)="onProductChange()">
             <option [ngValue]="null" disabled selected>Escolha um produto...</option>
-            <option *ngFor="let p of products" [ngValue]="p">{{ p.name }} ({{ p.category }})</option>
+            <option *ngFor="let p of groupedProducts" [ngValue]="p">{{ p.name }} ({{ p.category }})</option>
           </select>
         </div>
 
         <div class="form-group" *ngIf="selectedProduct">
-          <label class="form-label">Variação</label>
-          <select class="form-select" [(ngModel)]="selectedVariantIndex">
-            <option *ngFor="let v of selectedProduct.variants; let i = index" [ngValue]="i">
-              REF {{ v.sku || 'S/REF' }} — Cor: {{ v.color }} | Tam: {{ v.size }} — {{ v.stock }} un.
+          <label class="form-label">Cor</label>
+          <select class="form-select" [(ngModel)]="selectedColor" (change)="onColorChange()">
+            <option [ngValue]="null" disabled>Escolha a cor...</option>
+            <option *ngFor="let c of coresDisponiveis" [ngValue]="c">{{ c }}</option>
+          </select>
+        </div>
+
+        <div class="form-group" *ngIf="selectedColor">
+          <label class="form-label">Tamanho</label>
+          <select class="form-select" [(ngModel)]="selectedSize">
+            <option [ngValue]="null" disabled>Escolha o tamanho...</option>
+            <option *ngFor="let v of tamanhosDisponiveis" [ngValue]="v.size" [disabled]="(v.stock || 0) <= 0">
+              {{ v.size }} — {{ v.stock }} un.{{ (v.stock || 0) <= 0 ? ' (esgotado)' : '' }}
             </option>
           </select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Quantidade</label>
-          <input class="form-input" type="number" min="1" [(ngModel)]="quantity">
+        <!-- Resumo da variação escolhida -->
+        <div *ngIf="variacaoAtual"
+             style="background:#faf7f4; border:1px solid #efe7df; border-radius:8px; padding:10px 12px; font-size:0.85rem; color:#444; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <span>REF <strong>{{ variacaoAtual.sku || 'S/REF' }}</strong> · {{ variacaoAtual.stock }} un. em estoque</span>
+          <strong style="color:#313F2E;">{{ variacaoAtual.product_price | currency:'BRL':'symbol':'1.2-2' }}</strong>
         </div>
 
-        <button class="btn btn-add-cart btn-block" (click)="adicionarItem()" [disabled]="!selectedProduct">
+        <div class="form-group">
+          <label class="form-label">Quantidade</label>
+          <input class="form-input" type="number" min="1" [max]="variacaoAtual?.stock" [(ngModel)]="quantity">
+        </div>
+
+        <button class="btn btn-add-cart btn-block" (click)="adicionarItem()" [disabled]="!variacaoAtual">
           + Adicionar ao carrinho
         </button>
       </div>
@@ -81,6 +98,13 @@
             <option value="DINHEIRO">Dinheiro</option>
             <option value="PIX">Pix</option>
             <option value="CARTAO">Cartão</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tipo de venda</label>
+          <select class="form-select" [(ngModel)]="saleType">
+            <option value="PRESENCIAL">Presencial</option>
+            <option value="ECOMMERCE">E-commerce</option>
           </select>
         </div>
       </div>
