@@ -24,29 +24,44 @@
     </div>
   </div>
 
-  <div class="form-row">
-    <div class="form-group">
-      <label class="form-label">Cor Oficial</label>
-      <select class="form-select" formControlName="color">
-        <option value="" disabled selected>Selecione a cor...</option>
-        <option *ngFor="let c of availableColors" [value]="c.name">{{ c.name }}</option>
-      </select>
+  <!-- Grade de variações -->
+  <div class="variacoes-bloco">
+    <div class="variacoes-head">
+      <label class="form-label" style="margin:0;">Variações (cor · tamanho · estoque)</label>
+      <button type="button" class="btn-add-var" (click)="addVariacao()">+ Adicionar variação</button>
     </div>
-    <div class="form-group">
-      <label class="form-label">Tamanho</label>
-      <select class="form-select" formControlName="size">
-        <option value="" disabled selected>Selecione o tamanho...</option>
-        <option *ngFor="let s of filteredSizes" [value]="s.name">{{ s.name }}</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label class="form-label">Estoque (Qtd)</label>
-      <input class="form-input" type="number" formControlName="stock" min="0">
+
+    <div formArrayName="variants" class="variacoes-lista">
+      <div class="var-row" *ngFor="let vg of variants.controls; let i = index" [formGroupName]="i">
+        <div class="var-field">
+          <span class="var-mini-label">Cor</span>
+          <select class="form-select" formControlName="color">
+            <option value="" disabled>Cor...</option>
+            <option *ngFor="let c of availableColors" [value]="c.name">{{ c.name }}</option>
+          </select>
+        </div>
+
+        <div class="var-field">
+          <span class="var-mini-label">Tamanho</span>
+          <select class="form-select" formControlName="size">
+            <option value="" disabled>Tam...</option>
+            <option *ngFor="let s of filteredSizes" [value]="s.name">{{ s.name }}</option>
+          </select>
+        </div>
+
+        <div class="var-field var-estoque">
+          <span class="var-mini-label">Estoque</span>
+          <input class="form-input" type="number" min="0" formControlName="stock">
+        </div>
+
+        <button type="button" class="btn-remove-var" (click)="removerVariacao(i)" title="Remover variação"
+                [disabled]="variants.length <= 1">🗑️</button>
+      </div>
     </div>
   </div>
 
   <button type="submit" class="btn btn-primary btn-block" [disabled]="productForm.invalid || isSaving">
-    {{ isSaving ? 'Salvando...' : 'Salvar Produto' }}
+    {{ isSaving ? 'Salvando...' : (currentProductId ? 'Salvar alterações' : 'Salvar Produto') }}
   </button>
 
 </form>

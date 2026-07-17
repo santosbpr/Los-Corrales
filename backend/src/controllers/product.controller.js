@@ -35,13 +35,10 @@ const ProductController = {
     return res.status(200).json(data);
   },
 
-  // CRIAR
+  // CRIAR (um único registro por produto, com várias variações em `variants`)
   async create(req, res) {
     try {
-      const { name, category } = req.body;
-
-      const size = req.body.variants && req.body.variants.length > 0
-        ? req.body.variants[0].size : req.body.size;
+      const { category } = req.body;
 
       // Prefixo do SKU do produto a partir da categoria
       let prefix = 'PRD';
@@ -56,10 +53,10 @@ const ProductController = {
       if (countError) throw countError;
 
       const sequential = String((count || 0) + 1).padStart(4, '0');
-      const sizeSuffix = size ? `-${String(size).toUpperCase()}` : '';
-      const generatedSku = `${prefix}-${sequential}${sizeSuffix}`;
+      // SKU do PRODUTO é apenas prefixo+sequencial; cor/tamanho ficam no SKU da variação.
+      const generatedSku = `${prefix}-${sequential}`;
 
-      // Normaliza as variações (id + sku determinístico) usando o SKU do produto
+      // Normaliza TODAS as variações (id + sku determinístico) usando o SKU do produto
       const variants = normalizeVariants(generatedSku, req.body.variants);
 
       const { data, error } = await supabase
@@ -75,21 +72,18 @@ const ProductController = {
     }
   },
 
-  // ATUALIZAR
+  // ATUALIZAR (aceita a grade completa de variações, preservando ids existentes)
   async update(req, res) {
     try {
       const { id } = req.params;
 
-      // Busca o produto atual para preservar o SKU do produto e os ids das variações
       const { data: existing, error: fetchError } = await supabase
         .from('products').select('sku, variants').eq('id', id).single();
       if (fetchError || !existing) return res.status(404).json({ message: 'Produto não encontrado.' });
 
       const payload = { ...req.body };
-      // Nunca deixa o front sobrescrever o SKU do produto
-      delete payload.sku;
+      delete payload.sku; // nunca deixa o front sobrescrever o SKU do produto
 
-      // Se vierem variações, normaliza preservando ids existentes
       if (req.body.variants !== undefined) {
         payload.variants = normalizeVariants(existing.sku, req.body.variants, existing.variants || []);
       }
@@ -129,7 +123,7 @@ const ProductController = {
     }
   },
 
-  // REGISTRAR VENDA (mantido por índice; a Fase 1 migra para id da variação)
+  // REGISTRAR VENDA (mantido por índice; o PDV usa a RPC registrar_venda)
   async registerSale(req, res) {
     const { id } = req.params;
     const variantIndex = req.body.variantIndex || 0;
@@ -154,7 +148,6 @@ const ProductController = {
       const variant = updatedVariants[variantIndex];
       const variantDetails = `Cor: ${variant.color} | Tam: ${variant.size}`;
 
-      // Venda como transação: cabeçalho + item, e lançamento financeiro pelo total.
       await recordSale({
         customer_id: customerId,
         operator_email: req.currentUserEmail || req.headers['user-email'] || null,

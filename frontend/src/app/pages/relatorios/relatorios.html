@@ -55,7 +55,7 @@
         <div class="valor">{{ financial.saldo | currency:'BRL':'symbol':'1.2-2' }}</div>
       </div>
     </div>
-    <p class="nota">⚠️ {{ financial.observacao }}</p>
+    <!-- <p class="nota">⚠️ {{ financial.observacao }}</p> -->
   </div>
 
   <!-- ESTOQUE -->
@@ -63,14 +63,15 @@
     <h3 class="card-title">📦 Relatório de Estoque</h3>
     <div class="kpis">
       <div class="kpi neutro">
-        <div class="label">Quantidade parada (em estoque)</div>
+        <div class="label">Estoque atual (hoje)</div>
         <div class="valor">{{ inventory.totalEmEstoque }} un.</div>
       </div>
       <div class="kpi in">
-        <div class="label">Quantidade movimentada (período)</div>
+        <div class="label">Movimentado no período</div>
         <div class="valor">{{ inventory.totalMovimentado }} un.</div>
       </div>
     </div>
+    <!-- <p class="nota" *ngIf="inventory.observacao">ℹ️ {{ inventory.observacao }}</p> -->
 
     <div class="subtitulo">Mais movimentados no período</div>
     <div class="table-wrapper">
@@ -137,7 +138,7 @@
       </table>
     </div>
 
-    <div class="subtitulo">Funções mais realizadas</div>
+    <div class="subtitulo">Funções mais realizadas (geral)</div>
     <div class="table-wrapper">
       <table class="premium-table">
         <thead><tr><th>Função / Ação</th><th class="text-right">Vezes</th></tr></thead>
@@ -152,6 +153,26 @@
         </tbody>
       </table>
     </div>
+
+    <!-- #7: detalhe por usuário -->
+    <div class="subtitulo">Detalhe por usuário (função realizada por cada um)</div>
+    <div *ngFor="let u of users.detalhePorUsuario" style="margin-bottom: 18px;">
+      <div style="font-weight: 700; color: #313F2E; margin-bottom: 6px;">
+        {{ u.usuario }} <span style="color:#888; font-weight:600;">— {{ u.totalAcoes }} ação(ões)</span>
+      </div>
+      <div class="table-wrapper">
+        <table class="premium-table">
+          <thead><tr><th>Função / Ação</th><th class="text-right">Vezes</th></tr></thead>
+          <tbody>
+            <tr *ngFor="let a of u.acoes">
+              <td>{{ a.acao }}</td>
+              <td class="text-right">{{ a.total }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p *ngIf="users.detalhePorUsuario?.length === 0" class="empty-row">Nenhuma atividade registrada no período.</p>
   </div>
 
 </div>

@@ -45,7 +45,7 @@ const ReportController = {
     }
   },
 
-  // ===== RELATÓRIO DE ESTOQUE: quantidade parada e movimentada =====
+  // ===== RELATÓRIO DE ESTOQUE: quantidade parada (atual) e movimentada (período) =====
   async inventory(req, res) {
     try {
       const { start, end } = req.query;
@@ -66,11 +66,9 @@ const ReportController = {
         .from('sale_items').select('sale_id, variant_id, product_name, quantity');
       if (itemsErr) throw itemsErr;
 
-      // considera só itens das vendas no período (se houver filtro)
       const temFiltro = !!(start || end);
       const items = (allItems || []).filter(i => !temFiltro || saleIds.has(i.sale_id));
 
-      // movimentação por produto e conjunto de variações vendidas
       const movPorProduto = {};
       const variantesVendidas = new Set();
       let totalMovimentado = 0;
@@ -81,7 +79,7 @@ const ReportController = {
         if (it.variant_id) variantesVendidas.add(it.variant_id);
       }
 
-      // estoque parado (snapshot atual) + variações sem giro no período
+      // estoque atual (snapshot de HOJE) + variações sem giro no período
       let totalEmEstoque = 0;
       const semGiro = [];
       for (const p of (products || [])) {
@@ -104,10 +102,11 @@ const ReportController = {
 
       return res.status(200).json({
         periodo: { start: start || null, end: end || null },
-        totalEmEstoque,                 // "quantidade parada" (em estoque agora)
-        totalMovimentado,               // "quantidade movimentada" (vendida no período)
-        topMovimentados,
-        semGiro: semGiro.slice(0, 50)   // itens parados (com estoque e sem venda no período)
+        totalEmEstoque,                 // estoque ATUAL (hoje) — não depende do período
+        totalMovimentado,               // vendido no período
+        topMovimentados,                // por produto, no período
+        semGiro: semGiro.slice(0, 50),  // itens com estoque e sem venda no período
+        observacao: 'O "estoque atual" é a foto de hoje e não depende do período — não há histórico de movimentação para reconstruir o estoque de datas passadas. Já "movimentado", "mais movimentados" e "itens parados" consideram apenas as vendas dentro do período selecionado.'
       });
     } catch (err) {
       console.error('Erro no relatório de estoque:', err);
@@ -115,7 +114,7 @@ const ReportController = {
     }
   },
 
-  // ===== RELATÓRIO DE USUÁRIOS: mais ativos e funções mais realizadas =====
+  // ===== RELATÓRIO DE USUÁRIOS: ativos, funções e DETALHE por usuário =====
   async users(req, res) {
     try {
       const { start, end } = req.query;
@@ -127,10 +126,15 @@ const ReportController = {
       const rows = data || [];
       const porUsuario = {};
       const porAcao = {};
+      const matriz = {}; // usuario -> { acao -> contagem }
+
       for (const r of rows) {
         const u = r.user_email || 'DESCONHECIDO';
+        const a = r.action || 'OUTRA';
         porUsuario[u] = (porUsuario[u] || 0) + 1;
-        porAcao[r.action] = (porAcao[r.action] || 0) + 1;
+        porAcao[a] = (porAcao[a] || 0) + 1;
+        matriz[u] = matriz[u] || {};
+        matriz[u][a] = (matriz[u][a] || 0) + 1;
       }
 
       const maisAtivos = Object.entries(porUsuario)
@@ -141,11 +145,23 @@ const ReportController = {
         .map(([acao, total]) => ({ acao, total }))
         .sort((a, b) => b.total - a.total);
 
+      // Detalhe: para cada usuário, quais funções realizou e quantas vezes
+      const detalhePorUsuario = Object.entries(matriz)
+        .map(([usuario, acoesObj]) => {
+          const acoes = Object.entries(acoesObj)
+            .map(([acao, total]) => ({ acao, total }))
+            .sort((a, b) => b.total - a.total);
+          const totalAcoes = acoes.reduce((s, x) => s + x.total, 0);
+          return { usuario, totalAcoes, acoes };
+        })
+        .sort((a, b) => b.totalAcoes - a.totalAcoes);
+
       return res.status(200).json({
         periodo: { start: start || null, end: end || null },
         totalAcoes: rows.length,
         maisAtivos,
-        funcoesMaisRealizadas
+        funcoesMaisRealizadas,
+        detalhePorUsuario
       });
     } catch (err) {
       console.error('Erro no relatório de usuários:', err);

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup, FormControl, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import { NotificationService } from '../../services/notification.service';
@@ -23,33 +23,56 @@ export class ProductFormComponent implements OnInit {
   filteredSizes: any[] = [];
   isSaving = false;
 
+  productForm = new FormGroup({
+    name: new FormControl('', Validators.required),
+    category: new FormControl('', Validators.required),
+    price: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
+    cost: new FormControl<number>(0, [Validators.min(0)]),
+    variants: new FormArray<FormGroup>([], Validators.required)
+  });
+
+  get variants(): FormArray {
+    return this.productForm.get('variants') as FormArray;
+  }
+
+  private novaVariacao(v: any = {}): FormGroup {
+    return new FormGroup({
+      color: new FormControl(v.color || '', Validators.required),
+      size: new FormControl(v.size ?? '', Validators.required),
+      stock: new FormControl(v.stock ?? 0, [Validators.required, Validators.min(0)])
+    });
+  }
+
+  addVariacao() {
+    this.variants.push(this.novaVariacao({ stock: 0 }));
+  }
+
+  removerVariacao(i: number) {
+    if (this.variants.length > 1) this.variants.removeAt(i);
+    else this.notificationService.error('O produto precisa de ao menos uma variação.');
+  }
+
+  // Preenche o formulário ao abrir (edição) ou zera (novo)
   @Input() set product(val: any) {
+    this.variants.clear();
+
     if (val) {
       this.currentProductId = val.id;
       this.productForm.patchValue({
         name: val.name,
         category: val.category,
         price: val.price ?? null,
-        cost: val.cost ?? 0,
-        color: val.variants && val.variants.length > 0 ? val.variants[0].color : '',
-        size: val.variants && val.variants.length > 0 ? val.variants[0].size : '',
-        stock: val.variants && val.variants.length > 0 ? val.variants[0].stock : 0
+        cost: val.cost ?? 0
       });
+      const vs = Array.isArray(val.variants) && val.variants.length ? val.variants : [{}];
+      vs.forEach((v: any) => this.variants.push(this.novaVariacao(v)));
     } else {
-      this.productForm.reset({ stock: 1, cost: 0 });
       this.currentProductId = null;
+      this.productForm.patchValue({ name: '', category: '', price: null, cost: 0 });
+      this.productForm.markAsUntouched();
+      this.variants.push(this.novaVariacao({ stock: 1 }));
     }
   }
-
-  productForm = new FormGroup({
-    name: new FormControl('', Validators.required),
-    category: new FormControl('', Validators.required),
-    price: new FormControl(null, [Validators.required, Validators.min(0)]),
-    cost: new FormControl(0, [Validators.min(0)]),
-    color: new FormControl('', Validators.required),
-    size: new FormControl('', Validators.required),
-    stock: new FormControl(1, [Validators.required, Validators.min(0)])
-  });
 
   constructor(
     private productService: ProductService,
@@ -71,25 +94,23 @@ export class ProductFormComponent implements OnInit {
     this.settingsService.getSizes().subscribe({
       next: (data) => {
         this.allSizes = data;
-        this.filteredSizes = data;
+        this.filtrarTamanhosPorCategoria(this.productForm.get('category')?.value || null);
       },
       error: () => this.notificationService.error('Erro ao carregar grade de tamanhos.')
     });
 
-    this.productForm.get('category')?.valueChanges.subscribe(categoriaSelecionada => {
-      this.filtrarTamanhosPorCategoria(categoriaSelecionada);
+    // A categoria é do produto (uma só) e define a grade de tamanhos das variações
+    this.productForm.get('category')?.valueChanges.subscribe(cat => {
+      this.filtrarTamanhosPorCategoria(cat);
     });
   }
 
   filtrarTamanhosPorCategoria(categoria: string | null) {
-    if (!categoria) {
-      this.filteredSizes = this.allSizes;
-      return;
-    }
+    if (!categoria) { this.filteredSizes = this.allSizes; return; }
 
     const catTexto = categoria.toLowerCase();
-    const usarNumeros = ['calça', 'calca', 'bermuda', 'short'].some(palavra => catTexto.includes(palavra));
-    const usarLetras = ['camisa', 'camiseta', 'jaqueta', 'casaco', 'moletom'].some(palavra => catTexto.includes(palavra));
+    const usarNumeros = ['calça', 'calca', 'bermuda', 'short'].some(p => catTexto.includes(p));
+    const usarLetras = ['camisa', 'camiseta', 'jaqueta', 'casaco', 'moletom'].some(p => catTexto.includes(p));
 
     this.filteredSizes = this.allSizes.filter(size => {
       const isNumero = !isNaN(Number(size.name));
@@ -97,38 +118,48 @@ export class ProductFormComponent implements OnInit {
       if (usarLetras) return !isNumero;
       return true;
     });
-
-    this.productForm.patchValue({ size: '' });
   }
 
   onSubmit() {
     if (this.isSaving) return;
     if (!this.productForm.valid) {
       this.productForm.markAllAsTouched();
+      this.notificationService.error('Preencha os dados do produto e ao menos uma variação completa (cor, tamanho e estoque).');
       return;
     }
 
-    const formValues = this.productForm.value;
-    const newProduct = {
-      name: formValues.name,
-      category: formValues.category,
+    const fv = this.productForm.value as any;
+    const variants = (fv.variants || []).map((v: any) => ({
+      color: v.color,
+      size: v.size,
+      stock: Number(v.stock) || 0
+    }));
+
+    // Impede variações duplicadas (mesma cor + tamanho)
+    const chaves = new Set<string>();
+    for (const v of variants) {
+      const k = `${String(v.color).toUpperCase()}|${String(v.size).toUpperCase()}`;
+      if (chaves.has(k)) {
+        this.notificationService.error(`Variação duplicada: ${v.color} / ${v.size}. Remova a repetida.`);
+        return;
+      }
+      chaves.add(k);
+    }
+
+    const payload = {
+      name: fv.name,
+      category: fv.category,
       description: 'Produto cadastrado via sistema',
-      price: Number(formValues.price) || 0,
-      cost: Number(formValues.cost) || 0,
-      // Sem sku/id aqui — o backend gera o SKU determinístico e o id estável da variação.
-      variants: [
-        {
-          color: formValues.color,
-          size: formValues.size,
-          stock: formValues.stock
-        }
-      ]
+      price: Number(fv.price) || 0,
+      cost: Number(fv.cost) || 0,
+      // Sem sku/id aqui — o backend gera o SKU do produto e o id/sku de cada variação.
+      variants
     };
 
     this.isSaving = true;
     const request$ = this.currentProductId
-      ? this.productService.updateProduct(this.currentProductId, newProduct)
-      : this.productService.createProduct(newProduct);
+      ? this.productService.updateProduct(this.currentProductId, payload)
+      : this.productService.createProduct(payload);
 
     request$.pipe(finalize(() => this.isSaving = false)).subscribe({
       next: () => {
