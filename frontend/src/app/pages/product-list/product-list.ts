@@ -10,91 +10,93 @@ import { AuthService } from '../../services/auth.service';
   selector: 'app-product-list',
   standalone: true,
   imports: [CommonModule, ProductFormComponent, FormsModule],
-  templateUrl: './product-list.html', // Ajustado para o seu arquivo
-  styleUrl: './product-list.scss'     // Ajustado para o seu arquivo
+  templateUrl: './product-list.html',
+  styleUrl: './product-list.scss'
 })
 export class ProductListComponent implements OnInit {
-  products: any[] = [];
-  isModalOpen = false //Varial que controla a janela modal de cadastro
-  productToEdit: any = null; //Guarda o produto selecionado para edição
-  searchTerm: string = ''; // Variável para armazenar o termo de busca
-  expandedId: any = null;   // produto com variações expandidas
-  isAdmin = false;          // só ADMIN edita/cria/exclui
+  products: any[] = [];          // lista crua (1 registro por variação)
+  groupedProducts: any[] = [];   // agrupada por nome+categoria (o que a tela mostra)
+  isModalOpen = false;
+  productToEdit: any = null;
+  searchTerm: string = '';
+  expandedId: any = null;        // chave do grupo expandido
+  isAdmin = false;
 
   constructor(
     private productService: ProductService,
     private cdRef: ChangeDetectorRef,
     private notificationService: NotificationService,
     private auth: AuthService
-    ) {}
+  ) {}
 
-  // Função para filtrar os produtos com base no termo de busca
+  // Junta registros com o mesmo nome+categoria; cada variação guarda seu registro de origem.
+  private agruparProdutos(lista: any[]): any[] {
+    const map = new Map<string, any>();
+    for (const p of lista) {
+      const key = `${p.name}||${p.category}`;
+      if (!map.has(key)) map.set(key, { key, name: p.name, category: p.category, variants: [] });
+      const grupo = map.get(key);
+      const vars = Array.isArray(p.variants) ? p.variants : [];
+      for (const v of vars) {
+        grupo.variants.push({ ...v, product_id: p.id, product_price: p.price, _product: p });
+      }
+    }
+    return Array.from(map.values());
+  }
+
+  // Filtra os GRUPOS por nome, categoria ou SKU de variação
   get filteredProducts() {
     const termo = this.searchTerm.toLowerCase().trim();
-    if (!termo) return this.products;
-    return this.products.filter(product =>
-      (product.name || '').toLowerCase().includes(termo) ||
-      (product.sku || '').toLowerCase().includes(termo) ||
-      (Array.isArray(product.variants) &&
-        product.variants.some((v: any) => (v.sku || '').toLowerCase().includes(termo)))
+    if (!termo) return this.groupedProducts;
+    return this.groupedProducts.filter(g =>
+      (g.name || '').toLowerCase().includes(termo) ||
+      (g.category || '').toLowerCase().includes(termo) ||
+      g.variants.some((v: any) => (v.sku || '').toLowerCase().includes(termo))
     );
   }
 
-  // Soma o estoque de todas as variações
-  totalStock(product: any): number {
-    if (Array.isArray(product.variants)) {
-      return product.variants.reduce((s: number, v: any) => s + (Number(v.stock) || 0), 0);
+  totalStock(grupo: any): number {
+    if (Array.isArray(grupo.variants)) {
+      return grupo.variants.reduce((s: number, v: any) => s + (Number(v.stock) || 0), 0);
     }
-    return Number(product.quantity || product.stock || 0);
+    return 0;
   }
 
-  // Expande/colapsa as variações de um produto
-  toggleExpand(id: any) {
-    this.expandedId = this.expandedId === id ? null : id;
-  } 
-  
-  // Função para abror o modal de NOVo produto
+  toggleExpand(key: any) {
+    this.expandedId = this.expandedId === key ? null : key;
+  }
+
   openNewProductModal() {
-    this.productToEdit = null; // Garante que o formulário esteja vazio
+    this.productToEdit = null;
     this.isModalOpen = true;
   }
 
-  //Funcão para abrir o modal de edição, preenchendo os campos com os dados do produto selecionado
   editProduct(product: any) {
-
-    console.log('Produto selecionado para edição:', product);
-
-    this.productToEdit = product; // Passa os dados do produto para o formulário
+    this.productToEdit = product;
     this.isModalOpen = true;
   }
 
-  // Função para deletar um produto, confirmando a ação com o usuário
   deleteProduct(id: number, name: string = 'este item') {
     this.notificationService.confirmDelete(name).then((result) => {
-      // Se o usuário clicar no botão vermelho "Sim, excluir!" do pop-up bonitão
       if (result.isConfirmed) {
         this.productService.deleteProduct(id).subscribe({
           next: () => {
             this.notificationService.success('Produto removido com sucesso!');
-            this.loadData(); // <-- CORRIGIDO: mudamos de loadProducts para loadData
+            this.loadData();
           },
-          error: () => {
-            this.notificationService.error('Não foi possível excluir o produto.');
-          }
+          error: () => this.notificationService.error('Não foi possível excluir o produto.')
         });
       }
-    }); // <-- CORRIGIDO: Faltava fechar o parêntese do .then() aqui
+    });
   }
 
   ngOnInit(): void {
     this.isAdmin = this.auth.getRole() === 'ADMIN';
-    // Carrega os produtos qnd inicializado
     this.loadData();
-    
-    // recarregar a lista quando um produto for criado
+
     this.productService.refreshNeeded$.subscribe(() => {
       this.loadData();
-      this.closeModal(); // Fecha a modal após o cadastro
+      this.closeModal();
     });
   }
 
@@ -102,35 +104,13 @@ export class ProductListComponent implements OnInit {
     this.productService.getProducts().subscribe({
       next: (data: any) => {
         this.products = data.products ? data.products : data;
-
-        // Força a atualização da view para refletir os novos dados
-        this.cdRef.detectChanges(); 
-        console.log('Dados recebidos da API:', this.products);
+        this.groupedProducts = this.agruparProdutos(this.products);
+        this.cdRef.detectChanges();
       },
-      error: (err) => {
-        console.error('Erro ao buscar produtos:', err);
-      }
+      error: (err) => console.error('Erro ao buscar produtos:', err)
     });
   }
 
-  openModal() {
-    this.isModalOpen = true;
-  }
-
-  closeModal() {
-    this.isModalOpen = false;
-  }
-
-
-  // ngOnInit(): void {
-  //   this.productService.getProducts().subscribe({
-  //     next: (data: any) => {
-  //       this.products = data.products ? data.products : data;
-  //       console.log('Dados recebidos da API:', this.products);
-  //     },
-  //     error: (err) => {
-  //       console.error('Erro ao buscar produtos:', err);
-  //     }
-  //   });
-  // }
+  openModal() { this.isModalOpen = true; }
+  closeModal() { this.isModalOpen = false; }
 }

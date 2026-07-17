@@ -4,7 +4,7 @@
     <h1 class="page-title">Inventário Los Corrales</h1>
     <div class="actions-header">
       <div class="search-box">
-        <span>🔍</span> <input type="text" placeholder="Pesquisar por nome ou referência..." [(ngModel)]="searchTerm">
+        <span>🔍</span> <input type="text" placeholder="Pesquisar por nome, categoria ou referência..." [(ngModel)]="searchTerm">
       </div>
       <button *ngIf="isAdmin" class="btn-new-product" (click)="openNewProductModal()">
         + Novo Item
@@ -16,61 +16,48 @@
     <table class="premium-table">
       <thead>
         <tr>
-          <th>Ref. (SKU)</th>
-          <th>Nome do Produto</th>
+          <th>Produto</th>
+          <th>Categoria</th>
           <th class="text-center">Preço</th>
-          <th class="text-center">Estoque (variações)</th>
-          <th class="text-right">Ações</th>
+          <th class="text-center">Estoque total</th>
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let product of filteredProducts">
-          <tr>
-            <td class="product-ref">
-              <strong>{{ product.sku || product.reference || 'S/ REF' }}</strong>
-            </td>
-
-            <td class="product-name">
-              <strong>{{ product.name }}</strong>
-              <span class="product-category">{{ product.category }}</span>
-            </td>
-
-            <td class="text-center product-price">{{ product.price | currency:'BRL':'symbol':'1.2-2' }}</td>
-
+        <ng-container *ngFor="let g of filteredProducts">
+          <tr class="group-row" (click)="toggleExpand(g.key)" style="cursor: pointer;">
+            <td class="product-name"><strong>{{ g.name }}</strong></td>
+            <td><span class="product-category">{{ g.category }}</span></td>
+            <td class="text-center product-price">{{ g.variants[0]?.product_price | currency:'BRL':'symbol':'1.2-2' }}</td>
             <td class="text-center qty-column">
-              <button class="qty-toggle" (click)="toggleExpand(product.id)"
-                      *ngIf="product.variants && product.variants.length">
-                <strong>{{ totalStock(product) }}</strong> <span class="qty-unit">unids.</span>
-                <span class="caret">{{ expandedId === product.id ? '▾' : '▸' }} {{ product.variants.length }} var.</span>
-              </button>
-              <span *ngIf="!product.variants || !product.variants.length">
-                <strong>{{ totalStock(product) }}</strong> <span class="qty-unit">unids.</span>
-              </span>
-            </td>
-
-            <td class="text-right action-col">
-              <ng-container *ngIf="isAdmin; else somenteLeitura">
-                <button class="btn-action btn-edit" (click)="editProduct(product)">Editar</button>
-                <button class="btn-action btn-delete" (click)="deleteProduct(product.id, product.name)">Excluir</button>
-              </ng-container>
-              <ng-template #somenteLeitura><span class="ro-tag">somente leitura</span></ng-template>
+              <strong>{{ totalStock(g) }}</strong> <span class="qty-unit">un.</span>
+              <span class="caret">{{ expandedId === g.key ? '▾' : '▸' }} {{ g.variants.length }} var.</span>
             </td>
           </tr>
 
-          <!-- Linha expandida: variações -->
-          <tr class="variants-row" *ngIf="expandedId === product.id">
-            <td [attr.colspan]="5">
-              <div class="variants-grid">
-                <div class="variant-chip" *ngFor="let v of product.variants">
-                  <span class="v-ref">REF {{ v.sku || 'S/REF' }}</span>
-                  <span class="v-attr">Cor: {{ v.color }}</span>
-                  <span class="v-attr">Tam: {{ v.size }}</span>
-                  <span class="v-stock" [class.low]="(v.stock || 0) <= 0">{{ v.stock || 0 }} un.</span>
+          <!-- Linha expandida: variações do produto -->
+          <tr class="variants-row" *ngIf="expandedId === g.key">
+            <td [attr.colspan]="4">
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <div *ngFor="let v of g.variants"
+                     style="display: flex; align-items: center; gap: 16px; background: #fff; border: 1px solid #efe7df; border-radius: 8px; padding: 8px 12px; font-size: 0.85rem;">
+                  <span style="font-weight: 700; color: #313F2E; min-width: 170px;">REF {{ v.sku || 'S/REF' }}</span>
+                  <span style="color: #555;">Cor: <strong>{{ v.color }}</strong></span>
+                  <span style="color: #555;">Tam: <strong>{{ v.size }}</strong></span>
+                  <span style="font-weight: 700; margin-left: auto;"
+                        [style.color]="(v.stock || 0) <= 0 ? '#dc3545' : '#28a745'">{{ v.stock || 0 }} un.</span>
+                  <span *ngIf="isAdmin" style="display: flex; gap: 6px;">
+                    <button class="btn-action btn-edit" (click)="editProduct(v._product)">Editar</button>
+                    <button class="btn-action btn-delete" (click)="deleteProduct(v.product_id, g.name)">Excluir</button>
+                  </span>
                 </div>
               </div>
             </td>
           </tr>
         </ng-container>
+
+        <tr *ngIf="filteredProducts.length === 0">
+          <td colspan="4" style="text-align: center; padding: 24px; color: #999;">Nenhum produto encontrado.</td>
+        </tr>
       </tbody>
     </table>
   </div>
