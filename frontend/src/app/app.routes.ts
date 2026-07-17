@@ -7,6 +7,7 @@ import { ProfileComponent } from './pages/profile/profile';
 import { CrmComponent } from './pages/crm/crm';
 import { FinanceComponent } from './pages/finance/finance';
 import { RelatoriosComponent } from './pages/relatorios/relatorios';
+import { FornecedoresComponent } from './pages/fornecedores/fornecedores';
 import { loginGuard, roleGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -18,6 +19,7 @@ export const routes: Routes = [
     { path: 'dashboard', component: DashboardComponent, canActivate: [roleGuard(['ADMIN'])] },
     { path: 'finance', component: FinanceComponent, canActivate: [roleGuard(['ADMIN'])] },
     { path: 'profile', component: ProfileComponent, canActivate: [roleGuard(['ADMIN'])] },
+    { path: 'fornecedores', component: FornecedoresComponent, canActivate: [roleGuard(['ADMIN'])] },
 
     // CRM: ADMIN e CAIXA
     { path: 'crm', component: CrmComponent, canActivate: [roleGuard(['ADMIN', 'CAIXA'])] },

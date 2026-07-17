@@ -12,6 +12,7 @@ const userRoutes = require('./routes/users.routes');
 const reportRoutes = require('./routes/reports.routes');
 const exchangeRoutes = require('./routes/exchanges.routes');
 const salesRoutes = require('./routes/sales.routes');
+const supplierRoutes = require('./routes/suppliers.routes');
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/exchanges', exchangeRoutes);
 app.use('/api/sales', salesRoutes);
+app.use('/api/suppliers', supplierRoutes);
 
 app.get('/', (req, res) => {
   res.json({ message: 'API do ERP funcionando perfeitamente!', version: '1.0.0' });

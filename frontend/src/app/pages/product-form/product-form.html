@@ -1,70 +1,52 @@
-<form [formGroup]="productForm" (ngSubmit)="onSubmit()" style="display: flex; flex-direction: column; gap: 15px;">
-  
-  <div>
-    <label style="font-size: 14px; font-weight: bold; color: #333;">Nome do Produto</label>
-    <input type="text" formControlName="name" placeholder="Ex: Camisa Polo Pampa"
-           style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+<form [formGroup]="productForm" (ngSubmit)="onSubmit()" class="pf-form">
+
+  <div class="form-group">
+    <label class="form-label">Nome do Produto</label>
+    <input class="form-input" type="text" formControlName="name" placeholder="Ex: Camisa Polo Pampa">
   </div>
 
-  <div>
-    <label style="font-size: 14px; font-weight: bold; color: #333;">Categoria</label>
-    <select formControlName="category" 
-            style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+  <div class="form-group">
+    <label class="form-label">Categoria</label>
+    <select class="form-select" formControlName="category">
       <option value="" disabled selected>Selecione uma categoria...</option>
       <option *ngFor="let cat of availableCategories" [value]="cat.name">{{ cat.name }}</option>
     </select>
   </div>
 
-  <div style="display: flex; gap: 15px;">
-
-    <div style="flex: 1;">
-      <label style="font-size: 14px; font-weight: bold; color: #333;">Preço de Venda (R$)</label>
-      <input type="number" formControlName="price" min="0" step="0.01" placeholder="0.00"
-             style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Preço de Venda (R$)</label>
+      <input class="form-input" type="number" formControlName="price" min="0" step="0.01" placeholder="0.00">
     </div>
-
-    <div style="flex: 1;">
-      <label style="font-size: 14px; font-weight: bold; color: #333;">Custo (R$)</label>
-      <input type="number" formControlName="cost" min="0" step="0.01" placeholder="0.00"
-             style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+    <div class="form-group">
+      <label class="form-label">Custo (R$)</label>
+      <input class="form-input" type="number" formControlName="cost" min="0" step="0.01" placeholder="0.00">
     </div>
-
   </div>
 
-  <div style="display: flex; gap: 15px;">
-    
-    <div style="flex: 1;">
-      <label style="font-size: 14px; font-weight: bold; color: #333;">Cor Oficial</label>
-      <select formControlName="color" 
-              style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+  <div class="form-row">
+    <div class="form-group">
+      <label class="form-label">Cor Oficial</label>
+      <select class="form-select" formControlName="color">
         <option value="" disabled selected>Selecione a cor...</option>
         <option *ngFor="let c of availableColors" [value]="c.name">{{ c.name }}</option>
       </select>
     </div>
-
-    <div style="flex: 1;">
-      <label style="font-size: 14px; font-weight: bold; color: #333;">Tamanho</label>
-      <select formControlName="size" 
-              style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+    <div class="form-group">
+      <label class="form-label">Tamanho</label>
+      <select class="form-select" formControlName="size">
         <option value="" disabled selected>Selecione o tamanho...</option>
-        
         <option *ngFor="let s of filteredSizes" [value]="s.name">{{ s.name }}</option>
-        
       </select>
     </div>
-
-    <div style="flex: 1;">
-      <label style="font-size: 14px; font-weight: bold; color: #333;">Estoque (Qtd)</label>
-      <input type="number" formControlName="stock" min="0"
-             style="width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box;">
+    <div class="form-group">
+      <label class="form-label">Estoque (Qtd)</label>
+      <input class="form-input" type="number" formControlName="stock" min="0">
     </div>
-
   </div>
 
-  <button type="submit" [disabled]="productForm.invalid || isSaving"
-          style="margin-top: 15px; padding: 12px; background: #000; color: white; border: none; border-radius: 5px; font-weight: bold; font-size: 16px; cursor: pointer;"
-          [style.opacity]="isSaving ? 0.6 : 1">
+  <button type="submit" class="btn btn-primary btn-block" [disabled]="productForm.invalid || isSaving">
     {{ isSaving ? 'Salvando...' : 'Salvar Produto' }}
   </button>
-  
+
 </form>

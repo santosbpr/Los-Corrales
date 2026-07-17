@@ -1,0 +1,137 @@
+<div class="page">
+
+  <h2 class="page-title">🚚 Fornecedores</h2>
+  <p class="page-subtitle">Cadastre e gerencie os fornecedores da Los Corrales.</p>
+
+  <hr class="divider">
+
+  <div class="card">
+    <h3 class="card-title">Novo Fornecedor</h3>
+
+    <div class="form-row">
+      <div class="form-group grow-2">
+        <label class="form-label">Nome / Razão Social *</label>
+        <input class="form-input" type="text" [(ngModel)]="newSupplier.name" placeholder="Ex: Tecidos Sul Ltda">
+      </div>
+      <div class="form-group">
+        <label class="form-label">CNPJ</label>
+        <input class="form-input" type="text" [(ngModel)]="newSupplier.cnpj" placeholder="00.000.000/0000-00">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoria</label>
+        <input class="form-input" type="text" [(ngModel)]="newSupplier.category" placeholder="Ex: Tecidos, Selaria">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Telefone</label>
+        <input class="form-input" type="text" [(ngModel)]="newSupplier.phone" placeholder="(51) 99999-9999">
+      </div>
+      <div class="form-group grow-15">
+        <label class="form-label">E-mail</label>
+        <input class="form-input" type="email" [(ngModel)]="newSupplier.email" placeholder="contato@fornecedor.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contato</label>
+        <input class="form-input" type="text" [(ngModel)]="newSupplier.contact_name" placeholder="Nome do responsável">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group grow-3">
+        <label class="form-label">Observações</label>
+        <input class="form-input" type="text" [(ngModel)]="newSupplier.notes" placeholder="Prazo de entrega, condições...">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="salvar()" [disabled]="isSaving">
+        {{ isSaving ? 'Salvando...' : 'Salvar Fornecedor' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3 class="card-title">Fornecedores Cadastrados</h3>
+
+    <div class="table-wrapper">
+      <table class="premium-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Categoria</th>
+            <th>CNPJ</th>
+            <th>Contato</th>
+            <th>Telefone</th>
+            <th class="text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let s of suppliers">
+            <td><strong>{{ s.name }}</strong></td>
+            <td>{{ s.category || '—' }}</td>
+            <td>{{ s.cnpj || '—' }}</td>
+            <td>{{ s.contact_name || '—' }}</td>
+            <td>{{ s.phone || '—' }}</td>
+            <td class="text-right">
+              <button class="btn-icon" (click)="editar(s)" title="Editar">✏️</button>
+              <button class="btn-icon" (click)="excluir(s)" title="Remover">🗑️</button>
+            </td>
+          </tr>
+          <tr *ngIf="suppliers.length === 0">
+            <td colspan="6" class="empty-row">Nenhum fornecedor cadastrado ainda.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Modal de edição -->
+  <div class="modal-overlay" *ngIf="editing">
+    <div class="modal-card">
+      <h3 class="card-title">✏️ Editar Fornecedor</h3>
+      <div class="form-row">
+        <div class="form-group grow-2">
+          <label class="form-label">Nome / Razão Social *</label>
+          <input class="form-input" type="text" [(ngModel)]="editing.name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">CNPJ</label>
+          <input class="form-input" type="text" [(ngModel)]="editing.cnpj">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Categoria</label>
+          <input class="form-input" type="text" [(ngModel)]="editing.category">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input class="form-input" type="text" [(ngModel)]="editing.phone">
+        </div>
+        <div class="form-group grow-15">
+          <label class="form-label">E-mail</label>
+          <input class="form-input" type="email" [(ngModel)]="editing.email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contato</label>
+          <input class="form-input" type="text" [(ngModel)]="editing.contact_name">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group grow-3">
+          <label class="form-label">Observações</label>
+          <input class="form-input" type="text" [(ngModel)]="editing.notes">
+        </div>
+      </div>
+      <div class="form-actions modal-actions">
+        <button class="btn btn-secondary" (click)="cancelarEdicao()">Cancelar</button>
+        <button class="btn btn-primary" (click)="salvarEdicao()" [disabled]="isUpdating">
+          {{ isUpdating ? 'Salvando...' : 'Salvar alterações' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

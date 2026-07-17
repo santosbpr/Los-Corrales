@@ -1,7 +1,7 @@
 .product-list-container {
   padding: 30px;
   font-family: 'Inter', 'Segoe UI', sans-serif;
-  background-color: #f8f9fa; 
+  background-color: #f8f9fa;
   min-height: 100vh;
 }
 
@@ -14,231 +14,80 @@
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: 1.6rem; /* padronizado com as demais páginas */
   color: #1a1a1a;
   margin: 0;
   font-weight: 700;
 }
 
-.actions-header {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
+.actions-header { display: flex; gap: 15px; align-items: center; }
 
 /* --- PESQUISA --- */
 .search-box {
   position: relative;
-  
-  span {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.1rem;
-    color: #888;
-  }
-
+  span { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); font-size: 1.1rem; color: #888; }
   input {
-    padding: 12px 15px 12px 42px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    width: 280px;
-    transition: all 0.2s ease;
-    outline: none;
-
-    &:focus {
-      border-color: #8B4513; 
-      box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1);
-    }
+    padding: 12px 15px 12px 42px; border: 1px solid #d1d5db; border-radius: 8px;
+    font-size: 0.95rem; width: 280px; transition: all 0.2s ease; outline: none;
+    &:focus { border-color: #8B4513; box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.1); }
   }
 }
 
 .btn-new-product {
-  background-color: #8B4513;
-  color: #ffffff;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    background-color: #6b340e;
-    transform: translateY(-1px);
-  }
+  background-color: #8B4513; color: #fff; border: none; padding: 12px 20px;
+  border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
+  &:hover { background-color: #6b340e; transform: translateY(-1px); }
 }
 
 /* --- TABELA PREMIUM --- */
 .table-wrapper {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-  overflow: hidden; 
+  background-color: #fff; border-radius: 12px; box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  overflow: hidden; overflow-x: auto;
 }
 
 .premium-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
-
-  th {
-    background-color: #313F2E; 
-    color: #ffffff;
-    padding: 18px 16px;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    font-weight: 600;
-  }
-
-  td {
-    padding: 16px;
-    border-bottom: 1px solid #f1f1f1;
-    vertical-align: middle;
-    color: #333;
-  }
-
-  tbody tr:hover {
-    background-color: #fdfaf7; 
-  }
-
+  width: 100%; border-collapse: collapse; text-align: left;
+  th { background-color: #313F2E; color: #fff; padding: 18px 16px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+  td { padding: 16px; border-bottom: 1px solid #f1f1f1; vertical-align: middle; color: #333; }
+  tbody tr:hover { background-color: #fdfaf7; }
   .text-center { text-align: center; }
   .text-right { text-align: right; }
 
-  /* Estilo da Referência da Peça */
-  .product-ref {
-    font-family: 'Courier New', Courier, monospace;
-    font-size: 1.05rem;
-    color: #8B4513;
-    letter-spacing: 0.5px;
-  }
-
+  .product-ref { font-family: 'Courier New', Courier, monospace; font-size: 1.05rem; color: #8B4513; letter-spacing: 0.5px; }
   .product-name {
-    strong {
-      display: block;
-      font-size: 1.05rem;
-      color: #1a1a1a;
-      margin-bottom: 4px;
-    }
-    .product-category {
-      font-size: 0.75rem;
-      color: #666;
-      background-color: #f0f0f0;
-      padding: 3px 8px;
-      border-radius: 12px;
-      text-transform: uppercase;
-    }
+    strong { display: block; font-size: 1.05rem; color: #1a1a1a; margin-bottom: 4px; }
+    .product-category { font-size: 0.75rem; color: #666; background-color: #f0f0f0; padding: 3px 8px; border-radius: 12px; text-transform: uppercase; }
   }
-
-  .product-price {
-    font-weight: 600;
-    color: #313F2E;
-    font-size: 1.05rem;
-  }
-
+  .product-price { font-weight: 600; color: #313F2E; font-size: 1.05rem; }
   .qty-column {
-    strong {
-      font-size: 1.2rem;
-      color: #1a1a1a;
-    }
-    .qty-unit {
-      font-size: 0.75rem;
-      color: #888;
-      margin-left: 4px;
-    }
+    strong { font-size: 1.2rem; color: #1a1a1a; }
+    .qty-unit { font-size: 0.75rem; color: #888; margin-left: 4px; }
   }
-
-  /* Novos Botões de Ação Textuais */
-  .action-col {
-    white-space: nowrap;
-  }
-
+  .action-col { white-space: nowrap; }
   .btn-action {
-    background: none;
-    border: 1px solid transparent;
-    cursor: pointer;
-    font-size: 0.8rem;
-    font-weight: 700;
-    margin-left: 8px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    transition: all 0.2s;
-    text-transform: uppercase;
-
-    &.btn-edit {
-      color: #8B4513; 
-      border-color: #8B4513;
-      &:hover { 
-        background-color: #8B4513; 
-        color: #ffffff;
-      }
-    }
-
-    &.btn-delete {
-      color: #dc3545;
-      border-color: #dc3545;
-      &:hover { 
-        background-color: #dc3545; 
-        color: #ffffff;
-      }
-    }
+    background: none; border: 1px solid transparent; cursor: pointer; font-size: 0.8rem; font-weight: 700;
+    margin-left: 8px; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; text-transform: uppercase;
+    &.btn-edit { color: #8B4513; border-color: #8B4513; &:hover { background-color: #8B4513; color: #fff; } }
+    &.btn-delete { color: #dc3545; border-color: #dc3545; &:hover { background-color: #dc3545; color: #fff; } }
   }
 }
 
-/* --- MODAL E CAIXA BRANCA --- */
+/* --- MODAL --- */
 .modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px); 
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.6); display: flex; justify-content: center; align-items: center;
+  z-index: 1000; backdrop-filter: blur(4px);
 }
-
-/* A Mágica da Caixa Branca */
 .modal-white-box {
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto; /* Permite rolar se o formulário for grande */
-  position: relative;
+  background-color: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+  width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; position: relative;
 }
-
 .btn-close-modal {
-  margin-top: 15px;
-  width: 100%;
-  padding: 12px;
-  background-color: #f1f1f1;
-  color: #333;
-  border: none;
-  border-radius: 6px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: 0.2s;
-
-  &:hover {
-    background-color: #e2e2e2;
-  }
+  margin-top: 15px; width: 100%; padding: 12px; background-color: #f1f1f1; color: #333;
+  border: none; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s;
+  &:hover { background-color: #e2e2e2; }
 }
 
-.table-wrapper {
-  background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
-  
-  /* Permite rolar a tabela para os lados se a tela for pequena */
-  overflow-x: auto; 
-}
 /* ===== Variações no estoque (#9) ===== */
 .qty-toggle { background: none; border: none; cursor: pointer; font-size: inherit; color: inherit; display: inline-flex; align-items: center; gap: 8px; }
 .qty-toggle .caret { font-size: 0.72rem; color: #8B4513; font-weight: 600; }
@@ -250,3 +99,6 @@
 .variant-chip .v-attr { color: #555; }
 .variant-chip .v-stock { font-weight: 700; color: #28a745; }
 .variant-chip .v-stock.low { color: #dc3545; }
+
+/* leitura para não-admin */
+.ro-tag { font-size: 0.75rem; color: #999; font-style: italic; }

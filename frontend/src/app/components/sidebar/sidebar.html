@@ -28,6 +28,10 @@
       💰 Finanças
     </a>
 
+    <a *ngIf="can('ADMIN')" routerLink="/fornecedores" routerLinkActive="active-item" class="menu-link">
+      🚚 Fornecedores
+    </a>
+
     <a *ngIf="can('ADMIN')" routerLink="/profile" routerLinkActive="active-item" class="menu-link">
       ⚙️ Configurações
     </a>

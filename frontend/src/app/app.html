@@ -92,42 +92,53 @@
 </style>
 
 <div class="layout-container">
-  
+
   @if (showSidebar && isMobile) {
     <div class="mobile-topbar">
       <h2 style="margin: 0; font-size: 20px; letter-spacing: 1px;">Los Corrales</h2>
       <button class="hamburger-btn" (click)="toggleMobileMenu()">☰</button>
     </div>
-    
+
     <div class="overlay" [class.show]="mobileMenuOpen" (click)="toggleMobileMenu()"></div>
   }
 
   @if (showSidebar) {
     <div class="sidebar-container" [class.open]="mobileMenuOpen">
-      
+
       <div style="padding: 30px 20px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
         <h2 style="margin: 0; font-size: 22px; letter-spacing: 1px;">Los Corrales</h2>
-        
+
         @if (isMobile) {
           <button class="hamburger-btn" style="font-size: 20px;" (click)="toggleMobileMenu()">✕</button>
         }
       </div>
 
       <nav style="display: flex; flex-direction: column; padding: 20px 10px; gap: 5px;">
-        
-        @if (userRole === 'CAIXA' || userRole === 'ADMIN') {
-        <a routerLink="/products" routerLinkActive="active-link" class="menu-link">📦 Estoque</a>
-        <a routerLink="/pdv" routerLinkActive="active-link" class="menu-link">🛒 Frente de Caixa (PDV)</a>
-        <a routerLink="/crm" routerLinkActive="active-link" class="menu-link">👥 CRM (Clientes)</a>
+
+        <!-- Estoque: ADMIN, CAIXA (leitura) e ESTOQUISTA -->
+        @if (userRole === 'ADMIN' || userRole === 'CAIXA' || userRole === 'ESTOQUISTA') {
+          <a routerLink="/products" routerLinkActive="active-link" class="menu-link">📦 Estoque</a>
         }
-        
+
+        <!-- PDV e CRM: ADMIN e CAIXA -->
+        @if (userRole === 'ADMIN' || userRole === 'CAIXA') {
+          <a routerLink="/pdv" routerLinkActive="active-link" class="menu-link">🛒 Frente de Caixa (PDV)</a>
+          <a routerLink="/crm" routerLinkActive="active-link" class="menu-link">👥 CRM (Clientes)</a>
+        }
+
+        <!-- Relatórios: ADMIN, CAIXA (vendas) e ESTOQUISTA (estoque) -->
+        @if (userRole === 'ADMIN' || userRole === 'CAIXA' || userRole === 'ESTOQUISTA') {
+          <a routerLink="/relatorios" routerLinkActive="active-link" class="menu-link">📋 Relatórios</a>
+        }
+
+        <!-- Somente ADMIN -->
         @if (userRole === 'ADMIN') {
           <a routerLink="/dashboard" routerLinkActive="active-link" class="menu-link">📊 Dashboard</a>
           <a routerLink="/finance" routerLinkActive="active-link" class="menu-link">💰 Financeiro (Caixa)</a>
-          <a routerLink="/relatorios" routerLinkActive="active-link" class="menu-link">📋 Relatórios</a>
+          <a routerLink="/fornecedores" routerLinkActive="active-link" class="menu-link">🚚 Fornecedores</a>
           <a routerLink="/profile" routerLinkActive="active-link" class="menu-link">⚙️ Configurações (Perfil)</a>
         }
-        
+
         <a routerLink="/login" (click)="sair()" style="margin-top: 20px; color: #dc3545;" class="menu-link">🚪 Sair do Sistema</a>
       </nav>
 
