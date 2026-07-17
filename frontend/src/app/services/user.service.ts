@@ -9,18 +9,24 @@ export class UserService {
 
   constructor(private http: HttpClient) {}
 
-  // Lista usuários (e-mail + cargo). Credenciais vão pelo authInterceptor.
   getUsers(): Observable<any[]> {
     return this.http.get<any[]>(this.apiUrl);
   }
 
-  // Admin define nova senha para o usuário informado.
   resetPassword(email: string, password: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/reset-password`, { email, password });
   }
 
-  // Exclui um usuário pelo e-mail (a lista vem de profiles, sem uuid do auth).
   deleteUser(email: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${encodeURIComponent(email)}`);
+  }
+
+  // Solicitações de redefinição de senha pendentes
+  getResetRequests(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/reset-requests`);
+  }
+
+  dismissResetRequest(id: number | string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset-requests/${id}/dismiss`, {});
   }
 }

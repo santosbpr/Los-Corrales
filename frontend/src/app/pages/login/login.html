@@ -21,7 +21,7 @@
         <div class="input-group">
           <div class="label-row">
             <label>SENHA</label>
-            <a href="#" class="forgot-password">Esqueci a senha</a>
+            <a href="#" class="forgot-password" (click)="esqueciSenha($event)">{{ enviandoReset ? 'Enviando...' : 'Esqueci a senha' }}</a>
           </div>
           <input type="password" formControlName="password" placeholder="••••••••"
                  [ngClass]="{'is-invalid': loginForm.get('password')?.touched && loginForm.get('password')?.invalid}">
@@ -35,7 +35,7 @@
       </form>
 
       <div class="footer-text">
-        © Los Corrales Original Clothing 1980. <br>Todos os direitos reservados.
+        © Los Corrales Original Clothing 2022. <br>Todos os direitos reservados.
       </div>
       
     </div>

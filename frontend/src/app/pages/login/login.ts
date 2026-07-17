@@ -14,6 +14,7 @@ import { NotificationService } from '../../services/notification.service';
 })
 export class LoginComponent {
   isLoading: boolean = false;
+  enviandoReset: boolean = false;
 
   loginForm = new FormGroup({
     email: new FormControl('', [Validators.required, Validators.email]),
@@ -33,20 +34,43 @@ export class LoginComponent {
         next: (response) => {
           this.isLoading = false;
           this.notificationService.success('Bem-vindo ao Los Corrales!');
-
           const userRole = String(response.user?.role || 'CAIXA').toUpperCase();
           this.router.navigate([userRole === 'ADMIN' ? '/dashboard' : '/pdv']);
         },
         error: (err) => {
           this.isLoading = false;
-          // Detalhe técnico no console (code/detail) para diagnóstico
           console.error('Falha no login:', err.error || err);
-          // Mostra o motivo real vindo do backend
           this.notificationService.error(err.error?.message || 'Falha ao fazer login');
         }
       });
     } else {
       this.loginForm.markAllAsTouched();
     }
+  }
+
+  // Gera uma solicitação de redefinição de senha para o administrador
+  esqueciSenha(ev: Event) {
+    ev.preventDefault();
+    if (this.enviandoReset) return;
+
+    const emailCtrl = this.loginForm.get('email');
+    const email = String(emailCtrl?.value || '').trim();
+    if (!email || emailCtrl?.invalid) {
+      this.notificationService.error('Digite seu e-mail no campo acima e clique em "Esqueci a senha".');
+      emailCtrl?.markAsTouched();
+      return;
+    }
+
+    this.enviandoReset = true;
+    this.authService.forgotPassword(email).subscribe({
+      next: () => {
+        this.enviandoReset = false;
+        this.notificationService.success('Solicitação enviada! O administrador irá redefinir sua senha.');
+      },
+      error: (err) => {
+        this.enviandoReset = false;
+        this.notificationService.error(err.error?.message || 'Não foi possível enviar a solicitação.');
+      }
+    });
   }
 }

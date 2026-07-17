@@ -13,6 +13,14 @@
     </select>
   </div>
 
+  <div class="form-group">
+    <label class="form-label">Fornecedor</label>
+    <select class="form-select" formControlName="supplier_id">
+      <option [ngValue]="null">Sem fornecedor</option>
+      <option *ngFor="let s of suppliers" [ngValue]="s.id">{{ s.name }}{{ s.category ? ' — ' + s.category : '' }}</option>
+    </select>
+  </div>
+
   <div class="form-row">
     <div class="form-group">
       <label class="form-label">Preço de Venda (R$)</label>

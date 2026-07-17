@@ -5,6 +5,7 @@ import { finalize } from 'rxjs';
 import { ProductService } from '../../services/product.service';
 import { NotificationService } from '../../services/notification.service';
 import { SettingsService } from '../../services/settings.service';
+import { SupplierService } from '../../services/supplier.service';
 
 @Component({
   selector: 'app-product-form',
@@ -21,6 +22,7 @@ export class ProductFormComponent implements OnInit {
   availableCategories: any[] = [];
   allSizes: any[] = [];
   filteredSizes: any[] = [];
+  suppliers: any[] = [];
   isSaving = false;
 
   productForm = new FormGroup({
@@ -28,6 +30,7 @@ export class ProductFormComponent implements OnInit {
     category: new FormControl('', Validators.required),
     price: new FormControl<number | null>(null, [Validators.required, Validators.min(0)]),
     cost: new FormControl<number>(0, [Validators.min(0)]),
+    supplier_id: new FormControl<number | null>(null),
     variants: new FormArray<FormGroup>([], Validators.required)
   });
 
@@ -62,13 +65,14 @@ export class ProductFormComponent implements OnInit {
         name: val.name,
         category: val.category,
         price: val.price ?? null,
-        cost: val.cost ?? 0
+        cost: val.cost ?? 0,
+        supplier_id: val.supplier_id ?? null
       });
       const vs = Array.isArray(val.variants) && val.variants.length ? val.variants : [{}];
       vs.forEach((v: any) => this.variants.push(this.novaVariacao(v)));
     } else {
       this.currentProductId = null;
-      this.productForm.patchValue({ name: '', category: '', price: null, cost: 0 });
+      this.productForm.patchValue({ name: '', category: '', price: null, cost: 0, supplier_id: null });
       this.productForm.markAsUntouched();
       this.variants.push(this.novaVariacao({ stock: 1 }));
     }
@@ -77,7 +81,8 @@ export class ProductFormComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private notificationService: NotificationService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private supplierService: SupplierService
   ) {}
 
   ngOnInit() {
@@ -97,6 +102,12 @@ export class ProductFormComponent implements OnInit {
         this.filtrarTamanhosPorCategoria(this.productForm.get('category')?.value || null);
       },
       error: () => this.notificationService.error('Erro ao carregar grade de tamanhos.')
+    });
+
+    // Fornecedores (para o vínculo do produto)
+    this.supplierService.getSuppliers().subscribe({
+      next: (data) => this.suppliers = data || [],
+      error: () => { /* fornecedores é opcional no cadastro */ }
     });
 
     // A categoria é do produto (uma só) e define a grade de tamanhos das variações
@@ -152,6 +163,7 @@ export class ProductFormComponent implements OnInit {
       description: 'Produto cadastrado via sistema',
       price: Number(fv.price) || 0,
       cost: Number(fv.cost) || 0,
+      supplier_id: fv.supplier_id || null,
       // Sem sku/id aqui — o backend gera o SKU do produto e o id/sku de cada variação.
       variants
     };

@@ -19,19 +19,16 @@ export class ProfileComponent implements OnInit {
   sizes: any[] = [];
   categories: any[] = [];
   users: any[] = [];
+  resetRequests: any[] = [];
 
   newColorName: string = '';
   newSizeName: string = '';
   newCategoryName: string = '';
 
-  newUser = {
-    email: '',
-    password: '',
-    role: 'CAIXA'
-  };
+  newUser = { email: '', password: '', role: 'CAIXA' };
 
-  isCreatingUser = false;            // loading do botão "Registar Utilizador"
-  resettingEmail: string | null = null; // e-mail cuja senha está sendo resetada (loading por linha)
+  isCreatingUser = false;
+  resettingEmail: string | null = null;
 
   constructor(
     private settingsService: SettingsService,
@@ -44,6 +41,7 @@ export class ProfileComponent implements OnInit {
   ngOnInit() {
     this.loadAllSettings();
     this.loadUsers();
+    this.loadResetRequests();
   }
 
   loadAllSettings() {
@@ -51,12 +49,10 @@ export class ProfileComponent implements OnInit {
       next: (data) => { this.colors = data; this.cdr.detectChanges(); },
       error: () => this.notification.error('Erro ao carregar lista de cores.')
     });
-
     this.settingsService.getSizes().subscribe({
       next: (data) => { this.sizes = data; this.cdr.detectChanges(); },
       error: () => this.notification.error('Erro ao carregar lista de tamanhos.')
     });
-
     this.settingsService.getCategories().subscribe({
       next: (data) => { this.categories = data; this.cdr.detectChanges(); },
       error: () => this.notification.error('Erro ao carregar categorias.')
@@ -67,6 +63,13 @@ export class ProfileComponent implements OnInit {
     this.userService.getUsers().subscribe({
       next: (data) => { this.users = data; this.cdr.detectChanges(); },
       error: () => this.notification.error('Erro ao carregar a lista de usuários.')
+    });
+  }
+
+  loadResetRequests() {
+    this.userService.getResetRequests().subscribe({
+      next: (data) => { this.resetRequests = data || []; this.cdr.detectChanges(); },
+      error: () => { /* silencioso: seção some se não houver dados */ }
     });
   }
 
@@ -128,12 +131,11 @@ export class ProfileComponent implements OnInit {
   }
 
   salvarUtilizador() {
-    if (this.isCreatingUser) return; // evita duplo-clique
+    if (this.isCreatingUser) return;
     if (!this.newUser.email || !this.newUser.password) {
       this.notification.error('Preencha o e-mail e a palavra-passe!');
       return;
     }
-
     this.isCreatingUser = true;
     this.authService.register(this.newUser)
       .pipe(finalize(() => this.isCreatingUser = false))
@@ -141,7 +143,7 @@ export class ProfileComponent implements OnInit {
         next: () => {
           this.notification.success(`Utilizador ${this.newUser.role} criado com sucesso!`);
           this.newUser = { email: '', password: '', role: 'CAIXA' };
-          this.loadUsers(); // atualiza a lista com o novo usuário
+          this.loadUsers();
         },
         error: (err) => {
           console.error('Detalhes do erro do servidor:', err);
@@ -150,31 +152,38 @@ export class ProfileComponent implements OnInit {
       });
   }
 
-  // Reset de senha (ADMIN ou CAIXA): admin define a nova senha
+  // Reset de senha: admin define a nova senha
   resetarSenha(user: any) {
-    if (this.resettingEmail) return; // já há um reset em andamento
+    if (this.resettingEmail) return;
     this.notification.promptPasswordReset(user.email).then((newPassword) => {
-      if (!newPassword) return; // cancelado
+      if (!newPassword) return;
 
       this.resettingEmail = user.email;
       this.userService.resetPassword(user.email, newPassword)
         .pipe(finalize(() => { this.resettingEmail = null; this.cdr.detectChanges(); }))
         .subscribe({
-          next: () => this.notification.success(`Senha de ${user.email} redefinida!`),
+          next: () => {
+            this.notification.success(`Senha de ${user.email} redefinida!`);
+            this.loadResetRequests(); // a solicitação pendente some após o reset
+          },
           error: (err) => this.notification.error(err.error?.message || 'Não foi possível resetar a senha.')
         });
     });
   }
 
-  // Excluir permanentemente um funcionário do sistema
+  // Dispensa uma solicitação sem redefinir
+  dispensarSolicitacao(req: any) {
+    this.userService.dismissResetRequest(req.id).subscribe({
+      next: () => { this.notification.success('Solicitação dispensada.'); this.loadResetRequests(); },
+      error: () => this.notification.error('Não foi possível dispensar a solicitação.')
+    });
+  }
+
   excluirUtilizador(user: any) {
     this.notification.confirmDelete(user.email).then((result) => {
       if (result.isConfirmed) {
         this.userService.deleteUser(user.email).subscribe({
-          next: () => {
-            this.notification.success(`O acesso de ${user.email} foi removido com sucesso!`);
-            this.loadUsers(); // Recarrega a listagem de usuários na tela
-          },
+          next: () => { this.notification.success(`O acesso de ${user.email} foi removido com sucesso!`); this.loadUsers(); },
           error: (err) => {
             console.error('Erro ao deletar usuário:', err);
             this.notification.error(err.error?.message || 'Não foi possível excluir este usuário.');

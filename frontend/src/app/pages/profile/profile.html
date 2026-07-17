@@ -5,6 +5,32 @@
 
   <hr class="divider">
 
+  <!-- Solicitações de redefinição de senha (só aparece se houver pendentes) -->
+  <div class="card" *ngIf="resetRequests.length > 0" style="border-left: 4px solid #C9993A;">
+    <h3 class="card-title">🔔 Solicitações de senha pendentes ({{ resetRequests.length }})</h3>
+    <p class="page-subtitle" style="margin: 0 0 15px 0; font-size: 0.8rem;">
+      Funcionários que clicaram em "Esqueci a senha". Defina uma nova senha ou dispense a solicitação.
+    </p>
+    <div class="scroll-box">
+      <table class="premium-table">
+        <thead><tr><th>E-mail</th><th>Solicitado em</th><th class="text-right">Ações</th></tr></thead>
+        <tbody>
+          <tr *ngFor="let r of resetRequests">
+            <td><strong>{{ r.email }}</strong></td>
+            <td>{{ r.created_at | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="text-right user-actions">
+              <button class="btn btn-primary" (click)="resetarSenha({ email: r.email })"
+                      [disabled]="resettingEmail === r.email">
+                {{ resettingEmail === r.email ? 'Definindo...' : 'Definir nova senha' }}
+              </button>
+              <button class="btn-icon" (click)="dispensarSolicitacao(r)" title="Dispensar solicitação" style="margin-left: 8px;">✖️</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="settings-grid">
 
     <!-- Cores -->
